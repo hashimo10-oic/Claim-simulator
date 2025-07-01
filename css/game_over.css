@@ -1,0 +1,102 @@
+body {
+  font-family: 'Inter', sans-serif;
+  /* スタート画面と同じ背景スタイルを適用するよ */
+  background:
+    linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%), /* 非常に淡いピンクから少し濃いピンクへのグラデーションで、少し憂鬱な雰囲気 */
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="%23000000" opacity="0.03"/></svg>') repeat; /* ごく小さなドットパターン */
+  background-size: cover, 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  padding: 3rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  /* transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; /* コンテナのホバーアニメーションを削除するため、この行を削除またはコメントアウト */
+}
+
+.container:hover {
+  /* transform: translateY(-5px); /* ホバーで少し浮き上がるアニメーションを削除 */
+  /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1); /* ホバー時の影の強調を削除 */
+}
+
+/* メインタイトル（ランダムメッセージ）のスタイル */
+.main-title {
+  font-size: 3rem;
+  font-weight: 800;
+  text-align: center;
+  color: #b71c1c; /* 強い赤色で失敗感を強調 */
+  margin-bottom: 3.5rem;
+  letter-spacing: -0.05em;
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.3), 0 0 10px rgba(183, 28, 28, 0.5); /* 影と光彩でドラマチックに */
+  animation: pulseRed 1.5s infinite alternate; /* 赤く脈動するアニメーション */
+}
+
+/* レアメッセージ用スタイル */
+.rare-message {
+    color: #000; /* 黒文字 */
+    text-shadow:
+        -2px -2px 0 #FFFF66,
+         2px -2px 0 #FFFF66,
+        -2px  2px 0 #FFFF66,
+         2px  2px 0 #FFFF66,
+        0 0 15px rgba(255, 255, 102, 0.8); /* 黄色の縁取りと輝き */
+    animation: rareTextShake 0.5s ease-in-out infinite alternate; /* レアメッセージを震わせる */
+}
+
+/* ボタンのベーススタイルをスタート画面のaction-buttonと統一するよ */
+.action-button {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  border-radius: 0.75rem;
+  font-size: 1.875rem;
+  padding: 1.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
+  color: white; /* ボタンテキストは白に統一 */
+}
+
+.action-button:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ボタン内のテキストとアイコンのスタイル */
+.action-button span.relative {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Font Awesomeアイコンの右マージン */
+.action-button .fas {
+  margin-right: 0.75rem;
+}
+
+/* キーフレームアニメーション */
+@keyframes pulseRed {
+    0% { transform: scale(1); text-shadow: 3px 3px 6px rgba(0,0,0,0.3), 0 0 10px rgba(183, 28, 28, 0.5); }
+    100% { transform: scale(1.02); text-shadow: 4px 4px 8px rgba(0,0,0,0.4), 0 0 15px rgba(229, 57, 53, 0.7); }
+}
+
+@keyframes rareTextShake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}

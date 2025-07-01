@@ -1,0 +1,99 @@
+body {
+  font-family: 'Inter', sans-serif;
+  /* 成功を表す明るくわくわくする背景スタイルを適用するよ */
+  background:
+    linear-gradient(135deg, #e6fffa 0%, #b2ebf2 100%), /* 非常に淡いシアンから明るい水色へのグラデーション */
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><polygon points="0,50 50,0 100,50 50,100" fill="%23000000" opacity="0.03"/></svg>') repeat; /* 小さなひし形パターンでわくわく感を出すよ */
+  background-size: cover, 25px 25px; /* グラデーションは全体を覆い、パターンは少し大きめに繰り返すよ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  padding: 3rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  /* transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; /* コンテナのホバーアニメーションを削除するため、この行を削除またはコメントアウト */
+}
+
+.container:hover {
+  /* transform: translateY(-5px); /* ホバーで少し浮き上がるアニメーションを削除 */
+  /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1); /* ホバー時の影の強調を削除 */
+}
+
+/* メインタイトル（ランダムメッセージ）のスタイル */
+.main-title {
+  font-size: 3rem;
+  font-weight: 800;
+  text-align: center;
+  color: #2e7d32; /* 鮮やかな緑色で成功を強調 */
+  margin-bottom: 3.5rem;
+  letter-spacing: -0.05em;
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.2), 0 0 10px rgba(76, 175, 80, 0.5); /* 影と光彩でドラマチックに */
+  animation: pulseGreen 1.5s infinite alternate; /* 緑に脈動するアニメーション */
+}
+
+/* レアメッセージ用スタイル */
+.rare-message {
+    color: #fdd835; /* 鮮やかな黄色 */
+    text-shadow:
+        -2px -2px 0 #ffeb3b,
+         2px -2px 0 #ffeb3b,
+        -2px  2px 0 #ffeb3b,
+         2px  2px 0 #ffeb3b,
+        0 0 15px rgba(255, 235, 59, 0.8); /* 黄色の縁取りと輝き */
+    animation: rareTextGlow 1.5s ease-in-out infinite alternate; /* レアメッセージを輝かせる */
+}
+
+/* ボタンのベーススタイルをスタート画面のaction-buttonと統一するよ */
+.action-button {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  border-radius: 0.75rem;
+  font-size: 1.875rem;
+  padding: 1.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
+  color: white; /* ボタンテキストは白に統一 */
+}
+
+.action-button:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ボタン内のテキストとアイコンのスタイル */
+.action-button span.relative {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Font Awesomeアイコンの右マージン */
+.action-button .fas {
+  margin-right: 0.75rem;
+}
+
+/* キーフレームアニメーション */
+@keyframes pulseGreen {
+    0% { transform: scale(1); text-shadow: 3px 3px 6px rgba(0,0,0,0.2), 0 0 10px rgba(76, 175, 80, 0.5); }
+    100% { transform: scale(1.02); text-shadow: 4px 4px 8px rgba(0,0,0,0.3), 0 0 15px rgba(102, 187, 106, 0.7); }
+}
+
+@keyframes rareTextGlow {
+    0% { text-shadow: 0 0 8px #ffeb3b, 0 0 15px #ffc107; }
+    100% { text-shadow: 0 0 12px #ffeb3b, 0 0 20px #ffc107; }
+}
