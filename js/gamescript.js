@@ -1,4 +1,12 @@
+let gameDifficulty = 'normal'; // デフォルトの難易度
+
 document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const difficultyFromUrl = urlParams.get('difficulty');
+    if (['easy', 'normal', 'crazy'].includes(difficultyFromUrl)) {
+        gameDifficulty = difficultyFromUrl;
+    }
+
     // バックエンドAPIのエンドポイントURL
     const BACKEND_URL = 'http://localhost:3000';
 
@@ -111,28 +119,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function checkGameStatus(customerReply) {
-        const lowerCaseReply = customerReply.toLowerCase();
-        // server.jsのプロンプトとscript.jsを参考にキーワードを調整
-        const positiveKeywords = [
-            'ありがとうございます', '解決しました', '助かりました', '満足です', '納得しました',
-            '感謝します', '良かったです', 'それで結構です', 'それでお願いします', 'わかりました'
-        ];
-        const negativeKeywords = ['まだ', 'さらに', '納得できない', '許せない', 'ふざけるな', 'ありえない', '謝罪だけ', '解決しない', '不満', '怒り', 'だめ'];
+        let displayReply = customerReply;
 
-        let isPositive = positiveKeywords.some(keyword => lowerCaseReply.includes(keyword));
-        if (isPositive) {
+        // クリア判定
+        if (customerReply.includes('[CLEAR]')) {
+            displayReply = customerReply.replace('[CLEAR]', '').trim(); // 目印を削除
             clearInterval(gameInterval);
             showAlert('クレーム解決！完璧な対応だ！', 'success');
             setTimeout(() => window.location.href = getRelativePath('game_clear.html'), 1500);
-            return;
         }
-        
-        let isNegative = negativeKeywords.some(keyword => lowerCaseReply.includes(keyword));
-        if (isNegative) {
+        // ダメージ判定
+        else if (customerReply.includes('[DAMAGE]')) {
+            displayReply = customerReply.replace('[DAMAGE]', '').trim(); // 目印を削除
             currentHP--;
-            updateLifeIcons();
-            showAlert('対応を間違えた！HPが減りました...', 'error');
+            updateLifeIcons(); // HP表示を更新
         }
+
+        return displayReply; // 画面に表示する用の、目印が削除されたテキストを返す
     }
     
     async function getGeminiHint() {
@@ -174,7 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setRandomCustomerImage();
         setUIState(true);
         try {
-            const response = await fetch(`${BACKEND_URL}/api/initiate-claim`, { method: 'POST' });
+            const response = await fetch(`${BACKEND_URL}/api/initiate-claim`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty: gameDifficulty }) // 難易度情報を追加
+            });
             if (!response.ok) {
                 const errData = await response.json();
                 throw new Error(errData.error || `サーバーエラー: ${response.status}`);
@@ -209,7 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         conversationHistory: chatHistory,
-                        playerMessage: message
+                        playerMessage: message,
+                        difficulty: gameDifficulty // 難易度情報を追加
                     }),
                 });
                 if (!response.ok) {
@@ -222,8 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatHistory.push({ role: "user", parts: [{ text: message }] });
                 chatHistory.push({ role: "model", parts: [{ text: customerReply }] });
 
-                addMessageToHistory('お客様', customerReply);
-                checkGameStatus(customerReply);
+                const displayReply = checkGameStatus(customerReply); // 判定とテキスト整形を同時に行う
+                addMessageToHistory('お客様', displayReply); // 整形後のテキストを表示
 
             } catch (error) {
                 showAlert(`AI応答の取得に失敗しました: ${error.message}`, 'error');
@@ -237,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    // --- イベントリスナーや設定関連のコード (変更なし) ---
     getHintButton.addEventListener('click', getGeminiHint);
     settingsButton.addEventListener('click', () => settingsModal.classList.remove('hidden'));
     closeSettingsButton.addEventListener('click', () => settingsModal.classList.add('hidden'));
