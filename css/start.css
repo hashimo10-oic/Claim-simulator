@@ -1,0 +1,131 @@
+body {
+  font-family: 'Inter', sans-serif;
+  /* より洗練されたグラデーションと、ごくわずかなパターンを組み合わせるよ */
+  background:
+    linear-gradient(135deg, #e0f7fa 0%, #cce7f0 100%), /* 非常に淡い水色から青への柔らかいグラデーション */
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="%23000000" opacity="0.03"/></svg>') repeat; /* ごく小さなドットパターンでテクスチャ感を出すよ */
+  background-size: cover, 20px 20px; /* グラデーションは全体を覆い、パターンは小さく繰り返すよ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box; /* パディングを含めて要素の幅を計算するよ */
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  padding: 3rem; /* パディングをさらに増やしてゆとりを持たせるよ */
+  border-radius: 1.25rem; /* 角丸を大きくして柔らかさを出すよ */
+  background-color: #ffffff; /* 白い背景を維持 */
+  /* 影をより多層的で柔らかいものに変更し、高級感を出すよ */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0; /* 薄いボーダーを維持 */
+  /* コンテナのホバーアニメーションは削除済み */
+}
+
+/* 通常背景（デザイン変更により、ほぼcontainerと同じになるが、念のため残す） */
+.normal-background {
+  background-color: #ffffff;
+}
+
+/* レアな背景用（より鮮やかでわくわくするアクセントカラーに） */
+.rare-background {
+    background: linear-gradient(45deg, #a78bfa, #c4b5fd); /* 柔らかい紫のグラデーション */
+    border: 1px solid #8b5cf6; /* 濃い紫のボーダー */
+    box-shadow: 0 20px 50px rgba(139, 92, 246, 0.3); /* 紫系の影 */
+}
+
+/* 通常タイトル (スクロールコンテナの親) */
+.main-title {
+  font-size: 3rem; /* さらに大きくしてインパクトを出すよ */
+  font-weight: 800; /* 極太 */
+  text-align: center; /* 中央寄せを維持しつつ、テキストはスクロールさせるよ */
+  color: #1a202c; /* 濃いグレー */
+  margin-bottom: 3.5rem; /* 下マージンをさらに増やす */
+  letter-spacing: -0.05em; /* 文字間をさらに詰めてモダンな印象に */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* 軽い影で立体感を出すよ */
+
+  /* スクロールコンテナの親としての設定 */
+  white-space: nowrap; /* テキストを折り返さないようにするよ */
+  overflow: hidden; /* はみ出した部分を隠すよ */
+  position: relative; /* 子要素の基準にするよ */
+  width: 100%; /* 親要素の幅いっぱいに広げるよ */
+  box-sizing: border-box; /* パディングを含めて幅を計算するよ */
+  display: flex; /* 子要素を横並びにするためにflexboxを使うよ */
+  justify-content: center; /* 初期位置を中央に設定するよ */
+  align-items: center; /* 垂直方向中央揃え */
+}
+
+/* スクロールするコンテンツのラッパー */
+.marquee-content {
+    display: inline-flex; /* テキストの幅に合わせて要素の幅を調整するよ */
+    animation: scrollText var(--scroll-duration) linear infinite; /* アニメーションを適用するよ */
+    /* JSで初期オフセットを設定するため、ここではleft: 0; は設定しないよ */
+}
+
+/* スクロールするテキストアイテム */
+.scrolling-text-item,
+.scrolling-text-item-clone {
+    display: inline-block; /* テキストの幅に合わせて要素の幅を調整するよ */
+    flex-shrink: 0; /* 縮小しないようにするよ */
+    padding-right: 2em; /* テキスト間の隙間だよ */
+}
+
+/* レアなタイトルテキスト用（より鮮やかでわくわくする見た目に） */
+.rare-title .scrolling-text-item,
+.rare-title .scrolling-text-item-clone { /* rare-title内のスクロールテキストアイテムに適用 */
+    color: #fcd34d; /* 鮮やかな黄色 */
+    font-weight: 900; /* 超極太 */
+    text-shadow:
+      -3px -3px 0 #ef4444, /* 赤色の縁取りで強烈なインパクト */
+      3px -3px 0 #ef4444,
+      -3px  3px 0 #ef4444,
+      3px  3px 0 #ef4444,
+      0 0 15px rgba(252, 211, 77, 0.8); /* 輝くような光彩 */
+}
+
+.action-button {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out; /* アニメーションを滑らかに */
+  border-radius: 0.75rem; /* 角丸を少し大きく */
+  font-size: 1.875rem; /* 文字サイズを調整 */
+  padding: 1.5rem 2rem; /* パディングを調整 */
+  position: relative; /* 内部のspanの基準にするよ */
+  overflow: hidden; /* グラデーションがはみ出さないようにするよ */
+  border: none; /* デフォルトのボーダーは削除 */
+  cursor: pointer; /* カーソルをポインターにするよ */
+  /* ボタンの影をより多層的で柔らかいものに変更 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.action-button:hover {
+  transform: translateY(-4px) scale(1.01); /* 少し浮き上がり、わずかに拡大する効果 */
+  /* ホバー時の影を強調 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ボタン内のテキストとアイコンのスタイル */
+.action-button span.relative {
+  display: flex; /* アイコンとテキストを横並びにする */
+  align-items: center; /* 垂直方向中央揃え */
+  justify-content: center; /* 水平方向中央揃え */
+  width: 100%; /* 親要素いっぱいに広げる */
+  height: 100%; /* 親要素いっぱいに広げる */
+}
+
+/* Font Awesomeアイコンの右マージン */
+.action-button .fas {
+  margin-right: 0.75rem; /* アイコンとテキストの間にスペースを作るよ */
+}
+
+/* テキストスクロールのキーフレームアニメーション */
+@keyframes scrollText {
+  0% {
+    transform: translateX(0); /* marquee-contentの初期位置から開始 */
+  }
+  100% {
+    transform: translateX(var(--scroll-distance)); /* JSで設定される移動距離 */
+  }
+}
