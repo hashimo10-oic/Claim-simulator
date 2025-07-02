@@ -14,17 +14,20 @@ body {
 
 /* ゲーム画面全体のコンテナ */
 .game-container {
-    max-width: 900px; /* 最大幅を設定 */
+    max-width: 90%;
     width: 100%;
-    background-color: #ffffff; /* 背景は白に */
-    border-radius: 1.5rem; /* 角を丸くするよ */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* 影をつけて立体感を出すよ */
+    background-color: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem; /* 要素間のスペース */
-    height: 90vh; /* 画面高さの90%に固定するよ */
-    min-height: 600px; /* 最小高さを設定して小さくなりすぎないようにする */
+    gap: 1.5rem;
+    /* ▼▼▼ 変更 ▼▼▼ */
+    /* bodyのpadding(20px * 2)を考慮し、ビューポートの高さから引いた値を設定 */
+    height: calc(100vh - 40px);
+    /* ▲▲▲ 変更 ▲▲▲ */
+    min-height: 600px;
 }
 
 /* 画面上部のステータスバー */
@@ -92,6 +95,18 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 影を追加 */
 }
 
+/* お客様エリアとメッセージ履歴を囲む親コンテナ */
+.main-content-area {
+    display: flex;
+    flex-grow: 1;
+    gap: 1.5rem;
+    overflow: hidden;
+    /* ▼▼▼ 変更 ▼▼▼ */
+    /* flexアイテムがコンテンツサイズより小さく縮小できるように設定 */
+    min-height: 0;
+    /* ▲▲▲ 変更 ▲▲▲ */
+}
+
 /* メッセージ表示エリア (履歴) */
 .message-history {
     flex-grow: 1; /* 残りのスペースを埋める */
@@ -130,14 +145,17 @@ body {
 
 /* 自分のメッセージ入力エリア */
 .my-message-input {
-    width: 100%;
+    width: 85%;
     padding: 0.75rem 1rem;
-    border: 2px solid #94a3b8; /* 少し濃いグレーの枠線 */
+    border: 2px solid #94a3b8;
     border-radius: 0.75rem;
     font-size: 1.125rem;
     color: #334155;
-    resize: vertical; /* 縦方向のみリサイズ可能に */
-    min-height: 4rem; /* 最低限の高さ */
+    /* ▼▼▼ 変更 ▼▼▼ */
+    /* ユーザーが手動で高さを変更できないようにし、レイアウトを固定します */
+    resize: none;
+    /* ▲▲▲ 変更 ▲▲▲ */
+    min-height: 4rem;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     flex-shrink: 0;
 }
