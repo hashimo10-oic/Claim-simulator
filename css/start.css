@@ -129,3 +129,52 @@ body {
     transform: translateX(var(--scroll-distance)); /* JSで設定される移動距離 */
   }
 }
+
+/* 画像スクロールコンテナのスタイル */
+.image-marquee-container {
+  width: 100%;
+  overflow: hidden; /* はみ出した画像を隠す */
+  position: relative;
+  height: 80px; /* 画像の高さに合わせて調整 */
+  margin-top: 2rem; /* 上の要素との間隔 */
+  margin-bottom: 2rem; /* 下の要素との間隔 */
+  border-radius: 0.75rem; /* 角丸 */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* 軽い影 */
+  background-color: #f8fafc; /* 非常に薄いグレーの背景 */
+}
+
+/* 画像スクロールコンテンツのスタイル */
+.image-marquee-content {
+  display: flex; /* 画像を横並びにする */
+  height: 100%;
+  /* アニメーションの方向を左から右に変更 */
+  animation: scrollImage var(--image-scroll-duration) linear infinite; /* アニメーションを適用 */
+  /* 初期位置をCSS変数で設定 */
+  transform: translateX(var(--initial-image-offset)) translateZ(0); /* ハードウェアアクセラレーションを強制 */
+}
+
+/* スクロールする画像アイテムのスタイル */
+.scrolling-image-item {
+  flex-shrink: 0; /* 縮小しない */
+  height: 100%;
+  display: flex;
+  align-items: center; /* 垂直方向中央揃え */
+  padding: 0 1em; /* 画像間のパディング */
+}
+
+.scrolling-image-item img {
+  height: 100%; /* 親要素の高さに合わせる */
+  width: auto; /* アスペクト比を維持 */
+  object-fit: contain; /* 画像全体が表示されるようにする */
+}
+
+/* 画像スクロールのキーフレームアニメーション */
+@keyframes scrollImage {
+  /* 左から右へ流れるように変更 */
+  0% {
+    transform: translateX(var(--initial-image-offset)) translateZ(0); /* JSで設定される初期オフセットから開始 */
+  }
+  100% {
+    transform: translateX(0) translateZ(0); /* 0pxまで移動 */
+  }
+}

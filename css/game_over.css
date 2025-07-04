@@ -1,4 +1,4 @@
-body {
+ body {
   font-family: 'Inter', sans-serif;
   /* スタート画面と同じ背景スタイルを適用するよ */
   background:
@@ -100,3 +100,21 @@ body {
     75% { transform: translateX(-2px); }
     100% { transform: translateX(0); }
 }
+
+/* 新しく追加する動画コンテナのスタイル */
+.video-container {
+    margin-top: 2rem; /* 上部の要素との間にスペースを作るよ */
+    display: flex; /* 動画を中央に配置するためにflexboxを使うよ */
+    justify-content: center; /* 水平方向中央揃え */
+    align-items: center; /* 垂直方向中央揃え */
+    width: 100%; /* 親要素の幅いっぱいに広げるよ */
+}
+
+/* 動画要素自体のスタイル */
+#gameOverVideo {
+    max-width: 30%; /* 親要素の幅に対して30%の最大幅に設定 */
+    height: auto; /* アスペクト比を維持して高さを自動調整 */
+    display: block; /* インライン要素のデフォルトの余白をなくす */
+    margin: 0 auto; /* 中央寄せのために追加 */
+}
+ 
