@@ -97,3 +97,20 @@ body {
     0% { text-shadow: 0 0 8px #ffeb3b, 0 0 15px #ffc107; }
     100% { text-shadow: 0 0 12px #ffeb3b, 0 0 20px #ffc107; }
 }
+
+/* 新しく追加する動画コンテナのスタイル */
+.video-container {
+    margin-top: 2rem; /* 上部の要素との間にスペースを作るよ */
+    display: flex; /* 動画を中央に配置するためにflexboxを使うよ */
+    justify-content: center; /* 水平方向中央揃え */
+    align-items: center; /* 垂直方向中央揃え */
+    width: 100%; /* 親要素の幅いっぱいに広げるよ */
+}
+
+/* 動画要素自体のスタイル */
+#gameClearVideo { /* IDをgameClearVideoに変更したよ */
+    max-width: 30%; /* 親要素の幅に対して30%の最大幅に設定 */
+    height: auto; /* アスペクト比を維持して高さを自動調整 */
+    display: block; /* インライン要素のデフォルトの余白をなくす */
+    margin: 0 auto; /* 中央寄せのために追加 */
+}

@@ -1,17 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
   const mainTitle = document.getElementById('mainTitle');
-  const marqueeContent = mainTitle.querySelector('.marquee-content'); // 新しいラッパーdivを取得
+  const marqueeContent = mainTitle.querySelector('.marquee-content');
   const scrollingTextItem = marqueeContent.querySelector('.scrolling-text-item');
   const scrollingTextItemClone = marqueeContent.querySelector('.scrolling-text-item-clone');
   const container = document.getElementById('mainContainer');
 
-  // 背景音楽用のオーディオタグを取得するよ
+  const imageMarqueeContainer = document.querySelector('.image-marquee-container');
+  const imageMarqueeContent = document.getElementById('imageMarqueeContent');
+  // ユーザーのファイル構造と表示確認に基づき、画像パスを修正しました。
+  // start.htmlからの相対パスで、ikariフォルダ内の画像を参照します。
+  const imageSources = [
+    './ikari/ikari.png',
+    './ikari/ikari2.png',
+    './ikari/ikari3.png',
+    './ikari/ikari4.png',
+    './ikari/ikari5.png'
+  ];
+
   const backgroundMusic = document.getElementById('backgroundMusic');
 
-  // メッセージの元となる短いフレーズ
-  const baseTitleText = "カスタマーマスター"; // タイトルは常にこれにするよ
-
-  // レアメッセージの元となる短いフレーズ
+  const baseTitleText = "カスタマーマスター";
   const baseRareMessages = [
     "橋本社長考案！カスタマーマスター",
     "駿之介監督絶賛！カスタマーマスター",
@@ -19,90 +27,169 @@ document.addEventListener('DOMContentLoaded', () => {
     "カスタマーYOUKOUマスター"
   ];
 
-  const isRare = Math.random() < 0.05; // 5%
+  const isRare = Math.random() < 0.05;
 
-  // テキストを複数回繰り返して長い文字列を生成する関数
-  // 無限ループのシームレスさを確保するため、テキストは十分な長さにする必要があるよ
-  // ここでは、1つのアイテムに表示するテキストを生成するよ
-  const generateSingleItemText = (message, repeatCount = 20) => { // 繰り返し回数を大幅に増やしたよ (例: 20)
-    return Array(repeatCount).fill(message).join('　　'); // 全角スペースで区切って繰り返すよ
+  const generateSingleItemText = (message, repeatCount = 20) => {
+    return Array(repeatCount).fill(message).join('　　');
   };
 
-  let actualTextForScrolling = ""; // 実際にスクロールアイテムに設定するテキスト
+  let actualTextForScrolling = "";
 
   if (isRare) {
     const message = baseRareMessages[Math.floor(Math.random() * baseRareMessages.length)];
-    actualTextForScrolling = generateSingleItemText(message, 10); // レアメッセージも多めに繰り返す
+    actualTextForScrolling = generateSingleItemText(message, 10);
     mainTitle.classList.add('rare-title');
     container.classList.remove('normal-background');
     container.classList.add('rare-background');
     console.log("🎉 レア演出が表示されました！");
   } else {
-    actualTextForScrolling = generateSingleItemText(baseTitleText, 20); // 通常タイトルはさらに長めに繰り返す
+    actualTextForScrolling = generateSingleItemText(baseTitleText, 20);
     mainTitle.classList.remove('rare-title');
-    container.classList.add('normal-background'); // 念のため通常背景を適用
+    container.classList.add('normal-background');
   }
 
-  // スクロールテキストコンテンツにテキストを設定
   scrollingTextItem.textContent = actualTextForScrolling;
   scrollingTextItemClone.textContent = actualTextForScrolling;
 
-  // アニメーションの計算と設定
   // DOMがレンダリングされてから幅を取得するために、setTimeoutを使うよ
   setTimeout(() => {
-    const singleItemWidth = scrollingTextItem.offsetWidth; // 1つのテキストアイテムの幅
-    const textGapPx = parseFloat(getComputedStyle(scrollingTextItem).paddingRight); // CSSで設定したpadding-rightを取得
-
-    // アニメーションの移動距離 = 1つのアイテムの幅 + 隙間
-    const scrollDistance = -(singleItemWidth + textGapPx); // 左に移動するため負の値
-
-    // スクロール速度 (px/秒)。この値を調整して速度を変えるよ
-    const scrollSpeedPxPerSec = 60; // 以前の60px/秒を維持
-
-    // アニメーション時間 = 距離 / 速度
+    // テキストスクロールの設定
+    const singleItemWidth = scrollingTextItem.offsetWidth;
+    const textGapPx = parseFloat(getComputedStyle(scrollingTextItem).paddingRight);
+    const scrollDistance = -(singleItemWidth + textGapPx); // 右から左へ移動するため負の値
+    const scrollSpeedPxPerSec = 60; // テキストのスクロール速度
     const animationDuration = Math.abs(scrollDistance) / scrollSpeedPxPerSec;
 
-    // CSS変数に値を設定するよ
     marqueeContent.style.setProperty('--scroll-distance', `${scrollDistance}px`);
     marqueeContent.style.setProperty('--scroll-duration', `${animationDuration}s`);
-
-    // アニメーションをリセットして再開することで、新しい設定を適用するよ
-    marqueeContent.style.animation = 'none'; // 一旦アニメーションを停止
+    marqueeContent.style.animation = 'none';
     void marqueeContent.offsetWidth; // 強制的にリフロー
-    marqueeContent.style.animation = `scrollText var(--scroll-duration) linear infinite`; // アニメーションを再開
+    marqueeContent.style.animation = `scrollText var(--scroll-duration) linear infinite`;
 
-  }, 0); // DOMレンダリング後に実行
+    // 画像スクロールの設定
+    imageMarqueeContent.innerHTML = ''; // 既存の画像をクリア
+    console.log("画像スクロールコンテンツをクリアしました。");
 
-  // 「クレーム対応開始！」ボタンのイベントリスナー
+    const images = [];
+    const imageLoadPromises = imageSources.map(src => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src; // ここで正しいパスを使用
+      img.alt = 'スクロール画像';
+      console.log(`画像を読み込み中: ${src}`); // 読み込み中のログ
+      img.onload = () => {
+        console.log(`画像の読み込み成功: ${src}`); // 成功ログ
+        images.push(img); // 成功した画像のみを配列に追加
+        resolve(img);
+      };
+      img.onerror = () => {
+        console.error(`画像の読み込み失敗: ${src}。パスを確認してください。`); // 失敗ログ
+        reject(new Error(`Failed to load image: ${src}`));
+      };
+    }));
+
+    let singleSetWidth = 0; // 1セットの画像の合計幅
+
+    // 全ての画像がロードされるのを待つ
+    Promise.all(imageLoadPromises)
+    .then(loadedImages => {
+      // ロードに失敗した画像がある場合、loadedImagesには含まれないので、images配列を使用
+      if (images.length === 0) {
+        console.warn("読み込みに成功した画像がありません。画像パスとファイルを確認してください。");
+        return; // 処理を中断
+      }
+
+      // 1セット分の画像要素を一時的に作成し、幅を測定
+      const tempDiv = document.createElement('div');
+      tempDiv.style.display = 'flex';
+      tempDiv.style.visibility = 'hidden'; // 画面に表示しない
+      tempDiv.style.position = 'absolute'; // レイアウトに影響を与えない
+      tempDiv.style.height = '80px'; // CSSのimage-marquee-containerの高さと合わせる
+
+      images.forEach(img => {
+        const imgWrapper = document.createElement('div');
+        imgWrapper.classList.add('scrolling-image-item');
+        imgWrapper.appendChild(img.cloneNode(true)); // クローンを追加してDOM操作の副作用を避ける
+        tempDiv.appendChild(imgWrapper);
+      });
+      document.body.appendChild(tempDiv); // DOMに一時的に追加して正確な幅を取得
+      
+      // 個々の要素のoffsetWidthを合計して、より正確な1セットの幅を計算
+      Array.from(tempDiv.children).forEach(child => {
+        singleSetWidth += child.offsetWidth;
+      });
+
+      document.body.removeChild(tempDiv); // 測定後、一時的なdivを削除
+      console.log(`1セットの画像の合計幅 (計算後): ${singleSetWidth}px`);
+
+      // imageMarqueeContentに画像を複数セット追加
+      // シームレスなループのためには最低2セット必要。画面幅や画像サイズに応じて調整
+      // ここでは、コンテナの幅の2倍をカバーできる数 + 1セット分の余裕を持たせる
+      const numCopies = Math.ceil(imageMarqueeContainer.offsetWidth * 2 / singleSetWidth) + 1;
+      console.log(`複製するセット数: ${numCopies}`);
+      
+      for (let i = 0; i < numCopies; i++) {
+        images.forEach(img => { // ここでもimages配列を使用
+          const imgWrapper = document.createElement('div');
+          imgWrapper.classList.add('scrolling-image-item');
+          imgWrapper.appendChild(img.cloneNode(true));
+          imageMarqueeContent.appendChild(imgWrapper);
+        });
+      }
+      console.log(`画像がimageMarqueeContentに追加されました。`);
+
+      // スクロール距離と時間を設定
+      // 左から右へのスクロールなので、正の値
+      // 移動距離は1セット分の幅とする
+      const imageScrollDistance = singleSetWidth;
+      console.log(`画像スクロール距離 (正方向): ${imageScrollDistance}px`);
+
+      // 画像のスクロール速度をテキストと同じに設定
+      const imageScrollSpeedPxPerSec = scrollSpeedPxPerSec; // テキストと同じ速度 (60px/秒)
+      const imageAnimationDuration = imageScrollDistance / imageScrollSpeedPxPerSec;
+      console.log(`画像アニメーション時間: ${imageAnimationDuration}s`);
+
+      // CSS変数に設定
+      imageMarqueeContent.style.setProperty('--image-scroll-distance', `${imageScrollDistance}px`);
+      imageMarqueeContent.style.setProperty('--image-scroll-duration', `${imageAnimationDuration}s`);
+      // 初期オフセットをCSS変数で設定（アニメーションの開始位置）
+      // これにより、アニメーションの0%が画面の左端から始まるように見せる
+      imageMarqueeContent.style.setProperty('--initial-image-offset', `-${imageScrollDistance}px`);
+
+
+      // アニメーションをリセットして再開
+      imageMarqueeContent.style.animation = 'none';
+      void imageMarqueeContent.offsetWidth; // 強制的にリフロー
+      imageMarqueeContent.style.animation = `scrollImage var(--image-scroll-duration) linear infinite`;
+      console.log("画像スクロールアニメーションを開始しました。");
+
+    })
+    .catch(error => {
+      console.error("画像ロードまたは処理中に致命的なエラーが発生しました:", error);
+    });
+
+  }, 0);
+
   document.getElementById('startClaimButton').addEventListener('click', () => {
     console.log('「クレーム対応開始」が選択されました。');
-    // 別のページに遷移するなら音楽を一時停止するよ
     if (!backgroundMusic.paused) {
       backgroundMusic.pause();
     }
   });
 
-  // 「設定」ボタンのイベントリスナー
   document.getElementById('customerSettingsButton').addEventListener('click', () => {
     console.log('「設定」が選択されました。');
-    // window.location.href = 'customer_settings.html'; // 必要に応じて遷移
-    // 別のページに遷移するなら音楽を一時停止するよ
     if (!backgroundMusic.paused) {
       backgroundMusic.pause();
     }
   });
 
-  // 多くのブラウザでは、ユーザーがページ上で何らかの操作を行うまで音声の自動再生がブロックされるよ。
-  // そのため、ユーザーの最初のクリックで音楽が再生されるように試みるね。
   document.body.addEventListener('click', () => {
-    // 音楽がまだ再生されていない場合（または一時停止中の場合）のみ再生を試みる
     if (backgroundMusic.paused) {
       backgroundMusic.play().then(() => {
         console.log("BGMの自動再生を試みました。");
       }).catch(error => {
         console.log("BGMの自動再生はブロックされました。", error);
-        // ここにユーザーへのメッセージ表示などを追加してもいいよ
       });
     }
-  }, { once: true }); // 最初のクリックでのみ実行する
+  }, { once: true });
 });

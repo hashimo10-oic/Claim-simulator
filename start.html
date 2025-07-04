@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>カスタマーマスター - 業務開始</title>
-  <link rel="stylesheet" href="start.css">
+  <link rel="stylesheet" href="css/start.css"> <!-- パスを修正 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesomeアイコンライブラリを読み込むよ。ボタンアイコンに使うね -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -39,6 +39,14 @@
         </button>
       </a>
 
+      <!-- ここから画像スクロールを追加するよ -->
+      <div class="image-marquee-container mt-8"> <!-- 上部にマージンを追加 -->
+        <div class="image-marquee-content" id="imageMarqueeContent">
+          <!-- 画像はJavaScriptで動的に追加されるよ -->
+        </div>
+      </div>
+      <!-- 画像スクロールここまで -->
+
       <!-- BGM用のオーディオタグはそのままにするよ -->
       <audio id="backgroundMusic" autoplay loop>
         <!-- ここにBGMファイルのパスを設定するよ。Treasure.mp3を使用するね -->
@@ -48,6 +56,6 @@
     </div>
   </div>
 
-  <script src="start.js"></script>
+  <script src="js/start.js"></script> <!-- パスを修正 -->
 </body>
 </html>
