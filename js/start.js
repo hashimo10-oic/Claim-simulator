@@ -10,14 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // ユーザーのファイル構造と表示確認に基づき、画像パスを修正しました。
   // start.htmlからの相対パスで、ikariフォルダ内の画像を参照します。
   const imageSources = [
-    './ikari/ikari.png',
-    './ikari/ikari2.png',
-    './ikari/ikari3.png',
-    './ikari/ikari4.png',
-    './ikari/ikari5.png'
+    'ikari/ikari.png',
+    'ikari/ikari2.png',
+    'ikari/ikari3.png',
+    'ikari/ikari4.png',
+    'ikari/ikari5.png'
   ];
 
   const backgroundMusic = document.getElementById('backgroundMusic');
+
+  // 「カスタマーマスターとは？」ボタンとモーダルの要素を取得
+  const aboutGameButton = document.getElementById('aboutGameButton');
+  const gameDescriptionModal = document.getElementById('gameDescriptionModal');
+  const modalCloseButton = gameDescriptionModal.querySelector('.modal-close-button');
 
   const baseTitleText = "カスタマーマスター";
   const baseRareMessages = [
@@ -169,6 +174,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }, 0);
 
+  // 「カスタマーマスターとは？」ボタンのイベントリスナー
+  aboutGameButton.addEventListener('click', () => {
+    console.log('「カスタマーマスターとは？」ボタンがクリックされました。');
+    gameDescriptionModal.classList.add('visible');
+  });
+
+  // モーダルを閉じるイベントリスナー
+  modalCloseButton.addEventListener('click', () => {
+    console.log('モーダル閉じるボタンがクリックされました。');
+    gameDescriptionModal.classList.remove('visible');
+  });
+
+  // モーダルのオーバーレイ部分をクリックしても閉じるようにする
+  gameDescriptionModal.addEventListener('click', (event) => {
+    if (event.target === gameDescriptionModal) {
+      console.log('モーダルオーバーレイがクリックされました。');
+      gameDescriptionModal.classList.remove('visible');
+    }
+  });
+
   document.getElementById('startClaimButton').addEventListener('click', () => {
     console.log('「クレーム対応開始」が選択されました。');
     if (!backgroundMusic.paused) {
@@ -184,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.body.addEventListener('click', () => {
+    // 音楽がまだ再生されていない場合（または一時停止中の場合）のみ再生を試みる
     if (backgroundMusic.paused) {
       backgroundMusic.play().then(() => {
         console.log("BGMの自動再生を試みました。");

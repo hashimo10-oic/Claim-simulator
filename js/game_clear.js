@@ -1,4 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const fullscreenVideoContainer = document.getElementById('fullscreenVideoContainer');
+    const fullscreenGameClearVideo = document.getElementById('fullscreenGameClearVideo');
+    const mainGameClearContent = document.getElementById('mainGameClearContent');
+
+    // 初期設定: メインコンテンツを非表示にし、全画面動画を表示
+    mainGameClearContent.classList.add('hidden-content');
+    fullscreenVideoContainer.classList.remove('hidden-content');
+
+    // 全画面動画の再生を試みる
+    fullscreenGameClearVideo.play().then(() => {
+        console.log("全画面動画の自動再生を開始しました。");
+    }).catch(error => {
+        console.error("全画面動画の自動再生に失敗しました:", error);
+        // 自動再生がブロックされた場合のフォールバック: すぐにメインコンテンツを表示
+        fullscreenVideoContainer.classList.add('hidden-content');
+        mainGameClearContent.classList.remove('hidden-content');
+        console.log("全画面動画の自動再生がブロックされたため、直接メインコンテンツを表示します。");
+    });
+
+    // 全画面動画の再生が終了したら、メインコンテンツに切り替える
+    fullscreenGameClearVideo.addEventListener('ended', () => {
+        console.log("全画面動画が終了しました。メインコンテンツに切り替えます。");
+        fullscreenVideoContainer.classList.add('hidden-content'); // 全画面動画を非表示に
+        mainGameClearContent.classList.remove('hidden-content'); // メインコンテンツを表示に
+    });
+
     // 🌟 ランダムメッセージの表示処理 (以前のロジックを維持)
     const messages = [
         "完璧な対応ではないか！",

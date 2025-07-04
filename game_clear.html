@@ -3,61 +3,55 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ゲームクリア！ - 業務成功</title> <!-- タイトルを「成功」に合わせるよ -->
+    <title>ゲームクリア！ - 業務成功</title>
     <link rel="stylesheet" href="css/game_clear.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesomeアイコンライブラリを読み込むよ。ボタンアイコンに使うね -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="container bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-       <h1 id="randomMessage" class="main-title text-center mb-8">完璧な対応だ！</h1> <!-- タイトルを統一 -->
+    <!-- 全画面動画コンテナ - ページ読み込み時に最初に表示される -->
+    <div id="fullscreenVideoContainer" class="fullscreen-video-container">
+        <video id="fullscreenGameClearVideo" class="fullscreen-video" autoplay muted playsinline>
+            <!-- 動画ファイルのパスを設定してください -->
+            <source src="mv/game_clear.mp4" type="video/mp4">
+            あなたのブラウザは動画タグをサポートしていません。
+        </video>
+    </div>
 
-        <div class="space-y-8"> <!-- ボタン間の間隔を統一するよ -->
-            <a href="Level.html" class="block mx-auto max-w-sm"> <!-- ボタンの最大幅をmax-w-smに制限し、中央に配置するよ -->
-                <button id="changeDifficultyButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
-                    <span class="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-300 ease-out group-hover:to-emerald-700"></span>
-                    <span class="relative z-10 flex items-center justify-center">
-                        <i class="fas fa-level-up-alt mr-3"></i>次の難易度へ
-                    </span>
-                </button>
-            </a>
+    <!-- メインのゲームクリアコンテンツ - 動画終了後に表示される -->
+    <div id="mainGameClearContent" class="main-game-clear-content hidden-content">
+        <div class="container bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+           <!-- ゲームクリアアイコンを追加 -->
+           <div class="game-clear-icon-container text-center mb-6">
+               <i class="fas fa-check-circle text-green-600 text-6xl animate-bounce-in"></i>
+           </div>
 
-            <a href="start.html" class="block mx-auto max-w-sm"> <!-- ボタンの最大幅をmax-w-smに制限し、中央に配置するよ -->
-                <button id="homeButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
-                    <span class="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 ease-out group-hover:to-indigo-700"></span>
-                    <span class="relative z-10 flex items-center justify-center">
-                        <i class="fas fa-home mr-3"></i>メインメニューへ
-                    </span>
-                </button>
-            </a>
+           <!-- ここに「Game Clear」テキストを追加 -->
+           <h2 class="game-clear-text text-center mb-4">Game Clear!</h2>
+
+           <h1 id="randomMessage" class="main-title text-center mb-8">完璧な対応だ！</h1>
+
+            <div class="space-y-8">
+                <a href="Level.html" class="block mx-auto max-w-sm">
+                    <button id="changeDifficultyButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-300 ease-out group-hover:to-emerald-700"></span>
+                        <span class="relative z-10 flex items-center justify-center">
+                            <i class="fas fa-level-up-alt mr-3"></i>次の難易度へ
+                        </span>
+                    </button>
+                </a>
+
+                <a href="start.html" class="block mx-auto max-w-sm">
+                    <button id="homeButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 ease-out group-hover:to-indigo-700"></span>
+                        <span class="relative z-10 flex items-center justify-center">
+                            <i class="fas fa-home mr-3"></i>メインメニューへ
+                        </span>
+                    </button>
+                </a>
+            </div>
         </div>
-
-        <!-- ここから動画を追加するよ -->
-        <div class="video-container mt-8"> <!-- ボタンとの間にマージンを追加し、中央寄せのためにflexboxを使うよ -->
-            <!--
-                <video>タグの属性について:
-                - id: JavaScriptから要素にアクセスするためのID
-                - class: Tailwind CSSのクラスで幅を100%にし、角丸と影を追加
-                - controls: 再生/一時停止、音量などのコントロールを表示
-                - autoplay: ページ読み込み後に自動で再生を開始 (多くのブラウザではmutedと組み合わせないとブロックされる場合がある)
-                - loop: 動画を繰り返し再生
-                - muted: 音声をミュート (autoplayを機能させるためにも推奨)
-                - playsinline: iOS Safariでインライン再生を許可
-            -->
-            <video id="gameClearVideo" class="w-full rounded-lg shadow-md" controls autoplay loop muted playsinline>
-                <!--
-                    動画ファイルのパスをここに設定してください。
-                    例: "./video/gameclear.mp4"
-                    もし動画ファイルが `video` フォルダに `gameclear.mp4` という名前で存在する場合のパスです。
-                -->
-                <source src="gameclear.mp4" type="video/mp4">
-                <!-- ブラウザが動画タグをサポートしていない場合に表示されるメッセージ -->
-                あなたのブラウザは動画タグをサポートしていません。
-            </video>
-        </div>
-        <!-- 動画の追加ここまで -->
-
     </div>
 
 <script src="js/game_clear.js"></script>
