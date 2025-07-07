@@ -14,6 +14,15 @@ body {
   box-sizing: border-box; /* パディングを含めて要素の幅を計算するよ */
 }
 
+/* 色反転クラス (setting.cssからコピーして全ページに適用) */
+.color-inverted {
+    filter: invert(100%) !important;
+}
+.color-inverted img,
+.color-inverted video {
+    filter: invert(100%) !important;
+}
+
 .container {
   max-width: 600px;
   width: 100%;
@@ -63,7 +72,6 @@ body {
 .marquee-content {
     display: inline-flex; /* テキストの幅に合わせて要素の幅を調整するよ */
     animation: scrollText var(--scroll-duration) linear infinite; /* アニメーションを適用するよ */
-    /* JSで初期オフセットを設定するため、ここではleft: 0; は設定しないよ */
 }
 
 /* スクロールするテキストアイテム */
@@ -147,10 +155,10 @@ body {
 .image-marquee-content {
   display: flex; /* 画像を横並びにする */
   height: 100%;
-  /* アニメーションの方向を左から右に変更 */
-  animation: scrollImage var(--image-scroll-duration) linear infinite; /* アニメーションを適用 */
-  /* 初期位置をCSS変数で設定 */
-  transform: translateX(var(--initial-image-offset)) translateZ(0); /* ハードウェアアクセラレーションを強制 */
+  /* アニメーションの方向を右から左へ定義し、reverseで左から右へ流す */
+  animation: scrollImage var(--image-scroll-duration) linear infinite;
+  /* animation-direction: reverse; を削除して、キーフレームで方向を制御 */
+  transform: translateZ(0); /* ハードウェアアクセラレーションを強制 */
 }
 
 /* スクロールする画像アイテムのスタイル */
@@ -170,12 +178,12 @@ body {
 
 /* 画像スクロールのキーフレームアニメーション */
 @keyframes scrollImage {
-  /* 左から右へ流れるように変更 */
+  /* 左から右へ流れるように定義 */
   0% {
-    transform: translateX(var(--initial-image-offset)) translateZ(0); /* JSで設定される初期オフセットから開始 */
+    transform: translateX(var(--image-scroll-distance)) translateZ(0); /* --image-scroll-distance は負の値 */
   }
   100% {
-    transform: translateX(0) translateZ(0); /* 0pxまで移動 */
+    transform: translateX(0) translateZ(0);
   }
 }
 

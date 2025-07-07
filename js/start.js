@@ -127,9 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(`1セットの画像の合計幅 (計算後): ${singleSetWidth}px`);
 
       // imageMarqueeContentに画像を複数セット追加
-      // シームレスなループのためには最低2セット必要。画面幅や画像サイズに応じて調整
-      // ここでは、コンテナの幅の2倍をカバーできる数 + 1セット分の余裕を持たせる
-      const numCopies = Math.ceil(imageMarqueeContainer.offsetWidth * 2 / singleSetWidth) + 1;
+      // シームレスなループのためには、コンテナの幅の3倍をカバーできる数 + 1セット分の余裕を持たせる
+      const numCopies = Math.ceil(imageMarqueeContainer.offsetWidth * 3 / singleSetWidth) + 1; // 3倍の幅をカバー
       console.log(`複製するセット数: ${numCopies}`);
       
       for (let i = 0; i < numCopies; i++) {
@@ -143,22 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(`画像がimageMarqueeContentに追加されました。`);
 
       // スクロール距離と時間を設定
-      // 左から右へのスクロールなので、正の値
-      // 移動距離は1セット分の幅とする
-      const imageScrollDistance = singleSetWidth;
-      console.log(`画像スクロール距離 (正方向): ${imageScrollDistance}px`);
+      // 左から右への移動距離は1セット分の幅とする（負の値）
+      const imageScrollDistance = -singleSetWidth; // 負の値で左に移動
+      console.log(`画像スクロール距離 (負方向): ${imageScrollDistance}px`);
 
       // 画像のスクロール速度をテキストと同じに設定
       const imageScrollSpeedPxPerSec = scrollSpeedPxPerSec; // テキストと同じ速度 (60px/秒)
-      const imageAnimationDuration = imageScrollDistance / imageScrollSpeedPxPerSec;
+      const imageAnimationDuration = Math.abs(imageScrollDistance) / imageScrollSpeedPxPerSec;
       console.log(`画像アニメーション時間: ${imageAnimationDuration}s`);
 
       // CSS変数に設定
       imageMarqueeContent.style.setProperty('--image-scroll-distance', `${imageScrollDistance}px`);
       imageMarqueeContent.style.setProperty('--image-scroll-duration', `${imageAnimationDuration}s`);
-      // 初期オフセットをCSS変数で設定（アニメーションの開始位置）
-      // これにより、アニメーションの0%が画面の左端から始まるように見せる
-      imageMarqueeContent.style.setProperty('--initial-image-offset', `-${imageScrollDistance}px`);
 
 
       // アニメーションをリセットして再開
@@ -174,43 +169,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }, 0);
 
-  // 「カスタマーマスターとは？」ボタンのイベントリスナー
-  aboutGameButton.addEventListener('click', () => {
-    console.log('「カスタマーマスターとは？」ボタンがクリックされました。');
-    gameDescriptionModal.classList.add('visible');
-  });
-
-  // モーダルを閉じるイベントリスナー
-  modalCloseButton.addEventListener('click', () => {
-    console.log('モーダル閉じるボタンがクリックされました。');
-    gameDescriptionModal.classList.remove('visible');
-  });
-
-  // モーダルのオーバーレイ部分をクリックしても閉じるようにする
-  gameDescriptionModal.addEventListener('click', (event) => {
-    if (event.target === gameDescriptionModal) {
-      console.log('モーダルオーバーレイがクリックされました。');
-      gameDescriptionModal.classList.remove('visible');
-    }
-  });
-
   document.getElementById('startClaimButton').addEventListener('click', () => {
     console.log('「クレーム対応開始」が選択されました。');
-    if (!backgroundMusic.paused) {
-      backgroundMusic.pause();
-    }
+    // BGMの一時停止ロジックを削除しました
   });
 
   document.getElementById('customerSettingsButton').addEventListener('click', () => {
     console.log('「設定」が選択されました。');
-    if (!backgroundMusic.paused) {
-      backgroundMusic.pause();
-    }
+    // BGMの一時停止ロジックを削除しました
   });
 
   document.body.addEventListener('click', () => {
     // 音楽がまだ再生されていない場合（または一時停止中の場合）のみ再生を試みる
-    if (backgroundMusic.paused) {
+    if (backgroundMusic && backgroundMusic.paused) {
       backgroundMusic.play().then(() => {
         console.log("BGMの自動再生を試みました。");
       }).catch(error => {

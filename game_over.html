@@ -65,6 +65,64 @@
         </div>
     </div>
 
+<!-- 既存のHTMLコンテンツ -->
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const SETTINGS_KEYS = {
+          VIDEO_ENABLED: 'videoEnabled',
+          MUSIC_ENABLED: 'musicEnabled',
+          COLOR_INVERSION_ENABLED: 'colorInversionEnabled',
+          BGM_VOLUME: 'bgmVolume',
+          SFX_VOLUME: 'sfxVolume'
+        };
+
+        // 色反転設定の適用
+        const savedColorInversionEnabled = localStorage.getItem(SETTINGS_KEYS.COLOR_INVERSION_ENABLED);
+        if (savedColorInversionEnabled === 'true') {
+          document.body.classList.add('color-inverted');
+        } else {
+          document.body.classList.remove('color-inverted');
+        }
+
+        // 音楽設定の適用 (BGM)
+        const savedMusicEnabled = localStorage.getItem(SETTINGS_KEYS.MUSIC_ENABLED);
+        const backgroundMusic = document.getElementById('backgroundMusic'); // start.htmlのみに存在
+        if (backgroundMusic) {
+          if (savedMusicEnabled === 'false') {
+            backgroundMusic.muted = true;
+            backgroundMusic.pause(); // ミュートだけでなく停止もする
+          } else {
+            backgroundMusic.muted = false;
+            // backgroundMusic.play() はユーザーインタラクションが必要な場合があるので、
+            // 最初のクリックイベントで制御する start.js のロジックに任せる
+            // 音量設定も適用
+            const savedBGMVolume = localStorage.getItem(SETTINGS_KEYS.BGM_VOLUME);
+            if (savedBGMVolume !== null) {
+              backgroundMusic.volume = parseFloat(savedBGMVolume);
+            }
+          }
+        }
+
+        // 動画設定の適用 (このページには全画面動画はないが、テンプレートとして残す)
+        const savedVideoEnabled = localStorage.getItem(SETTINGS_KEYS.VIDEO_ENABLED);
+        const fullscreenVideoContainer = document.getElementById('fullscreenVideoContainer');
+        const fullscreenVideo = document.getElementById('fullscreenGameOverVideo') || document.getElementById('fullscreenGameClearVideo');
+
+        if (fullscreenVideoContainer && fullscreenVideo) {
+          if (savedVideoEnabled === 'false') {
+            fullscreenVideoContainer.style.display = 'none';
+            fullscreenVideo.pause();
+            const mainContent = document.getElementById('mainGameOverContent') || document.getElementById('mainGameClearContent');
+            if (mainContent) {
+              mainContent.classList.remove('hidden-content');
+            }
+          } else {
+            fullscreenVideoContainer.style.display = 'flex';
+          }
+        }
+      });
+    </script>
     <script src="js/game_over.js"></script>
 </body>
 </html>

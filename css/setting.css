@@ -1,0 +1,107 @@
+body {
+  font-family: 'Inter', sans-serif;
+  /* start.css と同じ背景スタイルを適用するよ */
+  background:
+    linear-gradient(135deg, #e0f7fa 0%, #cce7f0 100%),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="%23000000" opacity="0.03"/></svg>') repeat;
+  background-size: cover, 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* 色反転クラス */
+.color-inverted {
+    filter: invert(100%) !important; /* ページ全体の色を反転 - !important を追加 */
+}
+
+/* 色反転時に画像や動画が二重に反転しないように元に戻す */
+.color-inverted img,
+.color-inverted video {
+    filter: invert(100%) !important; /* !important を追加 */
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  padding: 3rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.main-title {
+  font-size: 3rem;
+  font-weight: 800;
+  text-align: center;
+  color: #1a202c;
+  margin-bottom: 3.5rem;
+  letter-spacing: -0.05em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.back-button-link {
+    display: inline-block;
+}
+
+/* 設定項目グループのスタイル */
+.setting-group {
+    border-top: 1px solid #e2e8f0; /* グループの区切り線 */
+    padding-top: 1.5rem;
+}
+
+/* 設定項目ごとのスタイル */
+.setting-item {
+    background-color: #f8fafc; /* 薄い背景色 */
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+    display: flex; /* ラベルと入力要素を横並びにする */
+    flex-direction: column; /* デフォルトは縦並び */
+    align-items: flex-start; /* 左寄せ */
+}
+
+.setting-item label {
+    margin-bottom: 0.5rem; /* ラベルと入力要素の間隔 */
+}
+
+/* スライダーの見た目をカスタマイズ */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #3b82f6; /* 青色 */
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.2s ease-in-out;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: background 0.2s ease-in-out;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: #2563eb; /* ホバーで少し濃い青 */
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  background: #2563eb;
+}
+
+/* トグルスイッチのスタイルをTailwindのクラスで定義 */
+/* peer-checked:bg-blue-600 などはTailwindのデフォルトで十分 */
+/* カスタムのpeer-focusやafter要素のスタイルはTailwindのCDNで提供される */

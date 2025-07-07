@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hardModeButton = document.getElementById('hardMode');
     const crazyModeButton = document.getElementById('crazyMode');
     const backButton = document.getElementById('backButton');
+    const backgroundMusic = document.getElementById('backgroundMusic'); // BGM要素を取得
 
     // 難易度ボタンがクリックされた時の処理だよ
     const selectDifficulty = (button, difficultyName) => {
@@ -15,11 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 選択された難易度をコンソールに表示するよ
         console.log(`${difficultyName} が選択されました。`);
+
+        // 遷移前にBGMを一時停止するロジックは削除しました。
+        // 新しいページでBGMが自動的に再生を試みます。
     };
 
     // 各ボタンにクリックイベントリスナーを追加するよ
-    // HTML側で<a>タグを使っているので、JavaScriptでの遷移は不要だが、
-    // ここではselectedクラスの切り替えのためにイベントリスナーは残すよ
     normalModeButton.addEventListener('click', () => {
         selectDifficulty(normalModeButton, 'ノーマルモード');
         // 必要であれば、ここにノーマルモード開始のロジックや遷移を追加するよ
@@ -27,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     hardModeButton.addEventListener('click', () => {
         selectDifficulty(hardModeButton, 'ハードモード');
-        // hard.htmlへの遷移はHTMLの<a>タグで処理されるよ
+        // hard.htmlへの遷移はHTMLの<a>タグで処理されるが、BGM停止のためここでも呼ぶ
     });
     crazyModeButton.addEventListener('click', () => {
         selectDifficulty(crazyModeButton, 'クレイジーモード');
@@ -38,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 戻るボタンがクリックされた時の処理だよ
     backButton.addEventListener('click', () => {
         console.log('戻るボタンがクリックされました。');
-        // HTMLの<a>タグでstart.htmlへの遷移が処理されるので、ここではカスタムアラートの表示のみにするよ
+        // 遷移前にBGMを一時停止するロジックは削除しました。
+        // 新しいページでBGMが自動的に再生を試みます。
         alertMessage('前の画面に戻ります。', 'info'); // カスタムアラートを表示
     });
 
@@ -70,4 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
             alertBox.addEventListener('transitionend', () => alertBox.remove(), { once: true });
         }, 3000); // 3秒後にフェードアウトを開始
     }
+
+    // 音楽の自動再生は、共通設定読み込みスクリプトとユーザーの最初のクリックイベントで制御される
+    // Level.htmlでもユーザーの最初のクリックでBGMが再生されるように試みる
+    document.body.addEventListener('click', () => {
+        if (backgroundMusic && backgroundMusic.paused) {
+            backgroundMusic.play().then(() => {
+                console.log("Level.html: BGMの自動再生を試みました。");
+            }).catch(error => {
+                console.log("Level.html: BGMの自動再生はブロックされました。", error);
+            });
+        }
+    }, { once: true });
 });
