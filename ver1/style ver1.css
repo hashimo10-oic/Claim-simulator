@@ -60,16 +60,15 @@ body {
     font-size: 1.75rem; /* ハートのサイズ */
 }
 
+
+/* ▼▼▼ 変更箇所 ▼▼▼ */
+
 /* お客様エリアとメッセージ履歴を囲む親コンテナ */
 .main-content-area {
     display: flex;
     flex-grow: 1; /* 親コンテナの残りの高さをすべて使用する */
     gap: 1.5rem;
     overflow: hidden; /* 中身がはみ出したら隠す */
-    /* ▼▼▼ 変更 ▼▼▼ */
-    /* flexアイテムがコンテンツサイズより小さく縮小できるように設定 */
-    min-height: 0;
-    /* ▲▲▲ 変更 ▲▲▲ */
 }
 
 /* お客様表示エリア */
@@ -96,12 +95,25 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 影を追加 */
 }
 
+/* お客様エリアとメッセージ履歴を囲む親コンテナ */
+.main-content-area {
+    display: flex;
+    flex-grow: 1;
+    gap: 1.5rem;
+    overflow: hidden;
+    /* ▼▼▼ 変更 ▼▼▼ */
+    /* flexアイテムがコンテンツサイズより小さく縮小できるように設定 */
+    min-height: 0;
+    /* ▲▲▲ 変更 ▲▲▲ */
+}
+
 /* メッセージ表示エリア (履歴) */
 .message-history {
     flex-grow: 1; /* 残りのスペースを埋める */
     background-color: #f0f9ff; /* 薄い水色の背景 */
     border-radius: 1rem;
     padding: 1.25rem;
+    /* margin-bottom: 1.5rem; ←不要になったので削除 */
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* 影 */
     display: flex;
     flex-direction: column;
@@ -109,6 +121,8 @@ body {
     scroll-behavior: smooth; /* スムーズスクロール */
     gap: 0.75rem; /* メッセージ間のスペース */
 }
+/* ▲▲▲ 変更箇所 ▲▲▲ */
+
 
 .message-box {
     background-color: #ffffff;
@@ -131,9 +145,7 @@ body {
 
 /* 自分のメッセージ入力エリア */
 .my-message-input {
-    /* ▼▼▼ 変更 ▼▼▼ */
     width: 85%;
-    /* ▲▲▲ 変更 ▲▲▲ */
     padding: 0.75rem 1rem;
     border: 2px solid #94a3b8;
     border-radius: 0.75rem;
@@ -289,6 +301,7 @@ body {
         align-items: flex-start; /* 左寄せ */
     }
 
+    /* ▼▼▼ 変更箇所 ▼▼▼ */
     .main-content-area {
         flex-direction: column; /* 小さな画面では縦並びに戻す */
         overflow: visible;
@@ -301,6 +314,7 @@ body {
         width: 96px; /* アイコンサイズを小さく */
         height: 96px;
     }
+    /* ▲▲▲ 変更箇所 ▲▲▲ */
 
     .timer, .complaint-text, .life-icons {
         font-size: 1.25rem; /* フォントサイズを少し小さく */
@@ -313,5 +327,8 @@ body {
     }
     .send-button, .hint-button { /* ヒントボタンもレスポンシブに */
         width: 100%; /* ボタンを全幅に */
+    }
+    .flex-col.md\:flex-row {
+        flex-direction: column; /* 小画面ではボタンも縦並びにする */
     }
 }
