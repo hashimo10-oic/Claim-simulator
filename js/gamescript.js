@@ -1,4 +1,4 @@
-let gameDifficulty = 'normal'; // デフォルトの難易度
+let gameDifficulty = 'normal';
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameDifficulty = difficultyFromUrl;
     }
 
-    // バックエンドAPIのエンドポイントURL
     const BACKEND_URL = 'http://localhost:3000';
 
     const gameTimerDisplay = document.getElementById('gameTimer');
@@ -17,10 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendMessageButton = document.getElementById('sendMessageButton');
     const complaintTextDisplay = document.getElementById('complaintText');
     const loadingIndicator = document.getElementById('loadingIndicator');
-    const getHintButton = document.getElementById('getHintButton');
     const customerImage = document.getElementById('customerImage');
 
-    // 設定モーダル関連の要素
+    const getHintButton = document.getElementById('getHintButton');
+    const showHintAgainButton = document.getElementById('showHintAgainButton');
+    const hintContainer = document.getElementById('hintContainer');
+    const hintTextDisplay = document.getElementById('hintText');
+    const closeHintButton = document.getElementById('closeHintButton');
+
     const settingsButton = document.getElementById('settingsButton');
     const settingsModal = document.getElementById('settingsModal');
     const closeSettingsButton = document.getElementById('closeSettings');
@@ -30,14 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const bgmVolumeDisplay = document.getElementById('bgmVolumeDisplay');
     const seVolumeDisplay = document.getElementById('seVolumeDisplay');
 
-    // ゲームの状態変数
-    let timeLeft = 5 * 60; // 5分 = 300秒
-    let currentHP = 3;    // 初期HP
-    let gameInterval;     // タイマーのインターバルID
-    let chatHistory = []; // 会話履歴
-    let currentComplaint = ""; // 現在のクレーム内容
+    let timeLeft = 5 * 60;
+    let currentHP = 3;
+    let gameInterval;
+    let chatHistory = [];
+    let currentComplaint = "";
+    let storedHint = null;
 
-    // お客様のアイコン画像のリスト
     const customerImageList = [
         'images/icon1.png', 'images/icon2.png', 'images/icon3.png',
         'images/icon4.png', 'images/icon5.png'
@@ -54,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alertBox.className = `custom-alert`;
         if (type === 'success') alertBox.style.backgroundColor = '#4CAF50';
         else if (type === 'error') alertBox.style.backgroundColor = '#f44336';
-        else if (type === 'hint') alertBox.style.backgroundColor = '#34D399';
         else alertBox.style.backgroundColor = '#2196F3';
         
         alertBox.textContent = message;
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             alertBox.classList.remove('show');
             alertBox.addEventListener('transitionend', () => alertBox.remove());
-        }, 5000);
+        }, 3000);
     }
 
     function addMessageToHistory(sender, message) {
@@ -112,7 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingIndicator.classList.toggle('hidden', !isLoading);
         sendMessageButton.disabled = isLoading;
         myMessageInput.disabled = isLoading;
-        getHintButton.disabled = isLoading;
+        if (storedHint === null) {
+            getHintButton.disabled = isLoading;
+        } else {
+            showHintAgainButton.disabled = isLoading;
+        }
         if (!isLoading) {
             myMessageInput.focus();
         }
@@ -121,26 +126,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkGameStatus(customerReply) {
         let displayReply = customerReply;
 
-        // クリア判定
         if (customerReply.includes('[CLEAR]')) {
-            displayReply = customerReply.replace('[CLEAR]', '').trim(); // 目印を削除
+            displayReply = customerReply.replace('[CLEAR]', '').trim();
             clearInterval(gameInterval);
             showAlert('クレーム解決！完璧な対応だ！', 'success');
             setTimeout(() => window.location.href = getRelativePath('game_clear.html'), 1500);
         }
-        // ダメージ判定
         else if (customerReply.includes('[DAMAGE]')) {
-            displayReply = customerReply.replace('[DAMAGE]', '').trim(); // 目印を削除
+            displayReply = customerReply.replace('[DAMAGE]', '').trim();
             currentHP--;
-            updateLifeIcons(); // HP表示を更新
+            updateLifeIcons();
         }
 
-        return displayReply; // 画面に表示する用の、目印が削除されたテキストを返す
+        return displayReply;
     }
     
     async function getGeminiHint() {
-        showAlert('ヒントを生成中...', 'info');
-        setUIState(true);
+        getHintButton.disabled = true; // 連打防止
         try {
             const response = await fetch(`${BACKEND_URL}/api/get-hint`, {
                 method: 'POST',
@@ -155,12 +157,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errData.error || `サーバーエラー: ${response.status}`);
             }
             const data = await response.json();
-            showAlert(`✨ヒント: ${data.hint}`, 'hint');
+            console.log("サーバーから受信したヒントデータ:", data); // デバッグ用に受信データを表示
+
+            const hintsArray = data.hints;
+
+            // 受信したデータが 'hints' キーを持つ配列であり、中身が空でないかを確認
+            if (Array.isArray(hintsArray) && hintsArray.length > 0) {
+                // データを箇条書きのHTMLリストに変換
+                storedHint = '<ul>' + hintsArray.map(h => `<li class="mb-1">・${h}</li>`).join('') + '</ul>';
+                hintTextDisplay.innerHTML = storedHint; // innerHTMLを使ってHTMLを解釈させる
+                hintContainer.classList.remove('hidden'); // ヒントボックスを表示
+                
+                getHintButton.classList.add('hidden'); // 「ヒントをもらう」を隠す
+                showHintAgainButton.classList.remove('hidden'); // 「再表示」を表示
+            } else {
+                // 想定外のデータだった場合はエラーとして扱う
+                throw new Error("AIから有効な形式のヒントが得られませんでした。");
+            }
+
         } catch (error) {
-            console.error('Gemini API呼び出しエラー (ヒント):', error);
-            showAlert(`ヒント生成中にエラーが発生しました: ${error.message}`, 'error');
-        } finally {
-            setUIState(false);
+            console.error('ヒント取得処理中のエラー:', error);
+            showAlert(error.message || 'ヒントの取得に失敗しました。再度お試しください。', 'error');
+            getHintButton.disabled = false; // エラーなら再度押せるようにする
         }
     }
 
@@ -180,17 +198,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BACKEND_URL}/api/initiate-claim`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ difficulty: gameDifficulty }) // 難易度情報を追加
+                body: JSON.stringify({ difficulty: gameDifficulty })
             });
             if (!response.ok) {
                 const errData = await response.json();
                 throw new Error(errData.error || `サーバーエラー: ${response.status}`);
             }
+            
             const data = await response.json();
             const initialClaim = data.claim;
+            const claimSummary = data.summary;
             
             currentComplaint = initialClaim;
-            complaintTextDisplay.textContent = currentComplaint;
+            complaintTextDisplay.textContent = claimSummary;
             addMessageToHistory('お客様', initialClaim);
             
             chatHistory = [{ role: "model", parts: [{ text: initialClaim }] }];
@@ -217,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({
                         conversationHistory: chatHistory,
                         playerMessage: message,
-                        difficulty: gameDifficulty // 難易度情報を追加
+                        difficulty: gameDifficulty
                     }),
                 });
                 if (!response.ok) {
@@ -230,8 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatHistory.push({ role: "user", parts: [{ text: message }] });
                 chatHistory.push({ role: "model", parts: [{ text: customerReply }] });
 
-                const displayReply = checkGameStatus(customerReply); // 判定とテキスト整形を同時に行う
-                addMessageToHistory('お客様', displayReply); // 整形後のテキストを表示
+                const displayReply = checkGameStatus(customerReply);
+                addMessageToHistory('お客様', displayReply);
 
             } catch (error) {
                 showAlert(`AI応答の取得に失敗しました: ${error.message}`, 'error');
@@ -246,6 +266,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     getHintButton.addEventListener('click', getGeminiHint);
+    
+    showHintAgainButton.addEventListener('click', () => {
+        if (storedHint) {
+            hintContainer.classList.remove('hidden');
+        }
+    });
+
+    closeHintButton.addEventListener('click', () => {
+        hintContainer.classList.add('hidden');
+    });
+
     settingsButton.addEventListener('click', () => settingsModal.classList.remove('hidden'));
     closeSettingsButton.addEventListener('click', () => settingsModal.classList.add('hidden'));
     
@@ -289,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ゲームの初期化
     updateLifeIcons();
     updateVolumeDisplays();
     gameInterval = setInterval(updateTimer, 1000);
