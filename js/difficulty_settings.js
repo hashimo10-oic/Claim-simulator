@@ -9,15 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // "ノーマルモード"ボタンで難易度"easy"を指定してゲーム画面へ
         window.location.href = './game_play.html?difficulty=easy';
     });
-
     hardModeButton.addEventListener('click', () => {
         // "ハードモード"ボタンで難易-度"normal"を指定してゲーム画面へ
         window.location.href = './game_play.html?difficulty=normal';
     });
-
     crazyModeButton.addEventListener('click', () => {
         // "クレイジーモード"ボタンで難易度"crazy"を指定してゲーム画面へ
-        window.location.href = './game_play.html?difficulty=crazy';
+　      window.location.href = './game_play.html?difficulty=crazy';
     });
 
     // 戻るボタンの処理 (前のページに戻る)
