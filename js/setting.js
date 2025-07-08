@@ -1,140 +1,225 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('設定画面が読み込まれました。');
+  const mainTitle = document.getElementById('mainTitle');
+  const marqueeContent = mainTitle.querySelector('.marquee-content');
+  const scrollingTextItem = marqueeContent.querySelector('.scrolling-text-item');
+  const scrollingTextItemClone = marqueeContent.querySelector('.scrolling-text-item-clone');
+  const container = document.getElementById('mainContainer');
 
-    const backButton = document.getElementById('backButton');
-    if (backButton) {
-        backButton.addEventListener('click', () => {
-            console.log('戻るボタンがクリックされました。');
-            // HTMLの<a>タグでstart.htmlへの遷移が処理される
+  const imageMarqueeContainer = document.querySelector('.image-marquee-container');
+  const imageMarqueeContent = document.getElementById('imageMarqueeContent');
+  // ユーザーのファイル構造と表示確認に基づき、画像パスを修正しました。
+  // start.htmlからの相対パスで、ikariフォルダ内の画像を参照します。
+  const imageSources = [
+    'ikari/ikari.png',
+    'ikari/ikari2.png',
+    'ikari/ikari3.png',
+    'ikari/ikari4.png',
+    'ikari/ikari5.png'
+  ];
+
+  const backgroundMusic = document.getElementById('backgroundMusic');
+
+  // 「カスタマーマスターとは？」ボタンとモーダルの要素を取得
+  const aboutGameButton = document.getElementById('aboutGameButton');
+  const gameDescriptionModal = document.getElementById('gameDescriptionModal');
+  const modalCloseButton = gameDescriptionModal.querySelector('.modal-close-button');
+
+  // デバッグログを追加: 要素が正しく取得されているか確認
+  console.log("aboutGameButton:", aboutGameButton);
+  console.log("gameDescriptionModal:", gameDescriptionModal);
+  console.log("modalCloseButton:", modalCloseButton);
+
+
+  const baseTitleText = "カスタマーマスター";
+  const baseRareMessages = [
+    "橋本社長考案！カスタマーマスター",
+    "駿之介監督絶賛！カスタマーマスター",
+    "前谷プロが作りました👍カスタマーマスター",
+    "カスタマーYOUKOUマスター"
+  ];
+
+  const isRare = Math.random() < 0.05;
+
+  const generateSingleItemText = (message, repeatCount = 20) => {
+    return Array(repeatCount).fill(message).join('　　');
+  };
+
+  let actualTextForScrolling = "";
+
+  if (isRare) {
+    const message = baseRareMessages[Math.floor(Math.random() * baseRareMessages.length)];
+    actualTextForScrolling = generateSingleItemText(message, 10);
+    mainTitle.classList.add('rare-title');
+    container.classList.remove('normal-background');
+    container.classList.add('rare-background');
+    console.log("🎉 レア演出が表示されました！");
+  } else {
+    actualTextForScrolling = generateSingleItemText(baseTitleText, 20);
+    mainTitle.classList.remove('rare-title');
+    container.classList.add('normal-background');
+  }
+
+  scrollingTextItem.textContent = actualTextForScrolling;
+  scrollingTextItemClone.textContent = actualTextForScrolling;
+
+  // DOMがレンダリングされてから幅を取得するために、setTimeoutを使うよ
+  setTimeout(() => {
+    // テキストスクロールの設定
+    const singleItemWidth = scrollingTextItem.offsetWidth;
+    const textGapPx = parseFloat(getComputedStyle(scrollingTextItem).paddingRight);
+    const scrollDistance = -(singleItemWidth + textGapPx); // 右から左へ移動するため負の値
+    const scrollSpeedPxPerSec = 60; // テキストのスクロール速度
+    const animationDuration = Math.abs(scrollDistance) / scrollSpeedPxPerSec;
+
+    marqueeContent.style.setProperty('--scroll-distance', `${scrollDistance}px`);
+    marqueeContent.style.setProperty('--scroll-duration', `${animationDuration}s`);
+    marqueeContent.style.animation = 'none';
+    void marqueeContent.offsetWidth; // 強制的にリフロー
+    marqueeContent.style.animation = `scrollText var(--scroll-duration) linear infinite`;
+
+    // 画像スクロールの設定
+    imageMarqueeContent.innerHTML = ''; // 既存の画像をクリア
+    console.log("画像スクロールコンテンツをクリアしました。");
+
+    const images = [];
+    const imageLoadPromises = imageSources.map(src => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src; // ここで正しいパスを使用
+      img.alt = 'スクロール画像';
+      console.log(`画像を読み込み中: ${src}`); // 読み込み中のログ
+      img.onload = () => {
+        console.log(`画像の読み込み成功: ${src}`); // 成功ログ
+        images.push(img); // 成功した画像のみを配列に追加
+        resolve(img);
+      };
+      img.onerror = () => {
+        console.error(`画像の読み込み失敗: ${src}。パスを確認してください。`); // 失敗ログ
+        reject(new Error(`Failed to load image: ${src}`));
+      };
+    }));
+
+    let singleSetWidth = 0; // 1セットの画像の合計幅
+
+    // 全ての画像がロードされるのを待つ
+    Promise.all(imageLoadPromises)
+    .then(loadedImages => {
+      // ロードに失敗した画像がある場合、loadedImagesには含まれないので、images配列を使用
+      if (images.length === 0) {
+        console.warn("読み込みに成功した画像がありません。画像パスとファイルを確認してください。");
+        return; // 処理を中断
+      }
+
+      // 1セット分の画像要素を一時的に作成し、幅を測定
+      const tempDiv = document.createElement('div');
+      tempDiv.style.display = 'flex';
+      tempDiv.style.visibility = 'hidden'; // 画面に表示しない
+      tempDiv.style.position = 'absolute'; // レイアウトに影響を与えない
+      tempDiv.style.height = '80px'; // CSSのimage-marquee-containerの高さと合わせる
+
+      images.forEach(img => {
+        const imgWrapper = document.createElement('div');
+        imgWrapper.classList.add('scrolling-image-item');
+        imgWrapper.appendChild(img.cloneNode(true)); // クローンを追加してDOM操作の副作用を避ける
+        tempDiv.appendChild(imgWrapper);
+      });
+      document.body.appendChild(tempDiv); // DOMに一時的に追加して正確な幅を取得
+      
+      // 個々の要素のoffsetWidthを合計して、より正確な1セットの幅を計算
+      Array.from(tempDiv.children).forEach(child => {
+        singleSetWidth += child.offsetWidth;
+      });
+
+      document.body.removeChild(tempDiv); // 測定後、一時的なdivを削除
+      console.log(`1セットの画像の合計幅 (計算後): ${singleSetWidth}px`);
+
+      // imageMarqueeContentに画像を複数セット追加
+      // シームレスなループのためには、コンテナの幅の3倍をカバーできる数 + 1セット分の余裕を持たせる
+      const numCopies = Math.ceil(imageMarqueeContainer.offsetWidth * 3 / singleSetWidth) + 1; // 3倍の幅をカバー
+      console.log(`複製するセット数: ${numCopies}`);
+      
+      for (let i = 0; i < numCopies; i++) {
+        images.forEach(img => { // ここでもimages配列を使用
+          const imgWrapper = document.createElement('div');
+          imgWrapper.classList.add('scrolling-image-item');
+          imgWrapper.appendChild(img.cloneNode(true));
+          imageMarqueeContent.appendChild(imgWrapper);
         });
-    }
+      }
+      console.log(`画像がimageMarqueeContentに追加されました。`);
 
-    // 設定要素の取得
-    const bgmVolumeSlider = document.getElementById('bgmVolume');
-    const sfxVolumeSlider = document.getElementById('sfxVolume');
-    const videoToggle = document.getElementById('videoToggle');
-    const musicToggle = document.getElementById('musicToggle');
-    const colorInversionToggle = document.getElementById('colorInversionToggle'); // 新しい色反転トグル
-    const notificationCheckbox = document.querySelector('.setting-item input[type="checkbox"]'); // 既存の通知設定チェックボックス
+      // スクロール距離と時間を設定
+      // 左から右への移動距離は1セット分の幅とする（負の値）
+      const imageScrollDistance = -singleSetWidth; // 負の値で左に移動
+      console.log(`画像スクロール距離 (負方向): ${imageScrollDistance}px`);
 
-    // localStorageのキーを定義
-    const SETTINGS_KEYS = {
-        BGM_VOLUME: 'bgmVolume',
-        SFX_VOLUME: 'sfxVolume',
-        VIDEO_ENABLED: 'videoEnabled',
-        MUSIC_ENABLED: 'musicEnabled',
-        COLOR_INVERSION_ENABLED: 'colorInversionEnabled', // 新しいキー
-        NOTIFICATIONS_ENABLED: 'notificationsEnabled' // 既存の通知設定用
-    };
+      // 画像のスクロール速度をテキストと同じに設定
+      const imageScrollSpeedPxPerSec = scrollSpeedPxPerSec; // テキストと同じ速度 (60px/秒)
+      const imageAnimationDuration = Math.abs(imageScrollDistance) / imageScrollSpeedPxPerSec;
+      console.log(`画像アニメーション時間: ${imageAnimationDuration}s`);
 
-    /**
-     * localStorageから設定を読み込み、UIに反映する
-     * ページ全体の色反転もここで適用する
-     */
-    const loadSettings = () => {
-        // BGM音量
-        const savedBGMVolume = localStorage.getItem(SETTINGS_KEYS.BGM_VOLUME);
-        if (bgmVolumeSlider && savedBGMVolume !== null) {
-            bgmVolumeSlider.value = parseFloat(savedBGMVolume);
-        } else if (bgmVolumeSlider) {
-            localStorage.setItem(SETTINGS_KEYS.BGM_VOLUME, bgmVolumeSlider.value);
-        }
-
-        // 効果音量
-        const savedSFXVolume = localStorage.getItem(SETTINGS_KEYS.SFX_VOLUME);
-        if (sfxVolumeSlider && savedSFXVolume !== null) {
-            sfxVolumeSlider.value = parseFloat(savedSFXVolume);
-        } else if (sfxVolumeSlider) {
-            localStorage.setItem(SETTINGS_KEYS.SFX_VOLUME, sfxVolumeSlider.value);
-        }
-
-        // 動画有効/無効
-        const savedVideoEnabled = localStorage.getItem(SETTINGS_KEYS.VIDEO_ENABLED);
-        if (videoToggle) {
-            videoToggle.checked = (savedVideoEnabled === 'true' || savedVideoEnabled === null); // デフォルトは有効
-            localStorage.setItem(SETTINGS_KEYS.VIDEO_ENABLED, videoToggle.checked);
-        }
-
-        // 音楽有効/無効
-        const savedMusicEnabled = localStorage.getItem(SETTINGS_KEYS.MUSIC_ENABLED);
-        if (musicToggle) {
-            musicToggle.checked = (savedMusicEnabled === 'true' || savedMusicEnabled === null); // デフォルトは有効
-            localStorage.setItem(SETTINGS_KEYS.MUSIC_ENABLED, musicToggle.checked);
-        }
-
-        // 色反転有効/無効
-        const savedColorInversionEnabled = localStorage.getItem(SETTINGS_KEYS.COLOR_INVERSION_ENABLED);
-        if (colorInversionToggle) {
-            // デフォルトは無効 (false)
-            colorInversionToggle.checked = (savedColorInversionEnabled === 'true');
-            localStorage.setItem(SETTINGS_KEYS.COLOR_INVERSION_ENABLED, colorInversionToggle.checked);
-            applyColorInversion(colorInversionToggle.checked); // ページ全体に適用
-        }
-
-        // 通知設定 (既存)
-        const savedNotificationsEnabled = localStorage.getItem(SETTINGS_KEYS.NOTIFICATIONS_ENABLED);
-        if (notificationCheckbox) {
-            notificationCheckbox.checked = (savedNotificationsEnabled === 'true' || savedNotificationsEnabled === null); // デフォルトは有効
-            localStorage.setItem(SETTINGS_KEYS.NOTIFICATIONS_ENABLED, notificationCheckbox.checked);
-        }
-
-        console.log("設定が読み込まれました:", {
-            bgm: bgmVolumeSlider ? bgmVolumeSlider.value : 'N/A',
-            sfx: sfxVolumeSlider ? sfxVolumeSlider.value : 'N/A',
-            video: videoToggle ? videoToggle.checked : 'N/A',
-            music: musicToggle ? musicToggle.checked : 'N/A',
-            colorInversion: colorInversionToggle ? colorInversionToggle.checked : 'N/A', // 新しいログ
-            notifications: notificationCheckbox ? notificationCheckbox.checked : 'N/A'
-        });
-    };
-
-    /**
-     * 設定が変更されたときにlocalStorageに保存する
-     * @param {string} key - localStorageのキー
-     * @param {*} value - 保存する値
-     */
-    const saveSetting = (key, value) => {
-        localStorage.setItem(key, value);
-        console.log(`設定を保存しました: ${key} = ${value}`);
-    };
-
-    /**
-     * ページ全体に色反転フィルターを適用/解除する
-     * @param {boolean} enabled - 色反転を有効にするかどうか
-     */
-    const applyColorInversion = (enabled) => {
-        if (enabled) {
-            document.body.classList.add('color-inverted');
-        } else {
-            document.body.classList.remove('color-inverted');
-        }
-    };
+      // CSS変数に設定
+      imageMarqueeContent.style.setProperty('--image-scroll-distance', `${imageScrollDistance}px`);
+      imageMarqueeContent.style.setProperty('--image-scroll-duration', `${imageAnimationDuration}s`);
 
 
-    // イベントリスナーの追加
-    if (bgmVolumeSlider) {
-        bgmVolumeSlider.addEventListener('input', (event) => saveSetting(SETTINGS_KEYS.BGM_VOLUME, event.target.value));
-    }
-    if (sfxVolumeSlider) {
-        sfxVolumeSlider.addEventListener('input', (event) => saveSetting(SETTINGS_KEYS.SFX_VOLUME, event.target.value));
-    }
-    if (videoToggle) {
-        videoToggle.addEventListener('change', (event) => saveSetting(SETTINGS_KEYS.VIDEO_ENABLED, event.target.checked));
-    }
-    if (musicToggle) {
-        musicToggle.addEventListener('change', (event) => saveSetting(SETTINGS_KEYS.MUSIC_ENABLED, event.target.checked));
-    }
-    if (colorInversionToggle) {
-        colorInversionToggle.addEventListener('change', (event) => {
-            const isChecked = event.target.checked;
-            saveSetting(SETTINGS_KEYS.COLOR_INVERSION_ENABLED, isChecked);
-            applyColorInversion(isChecked); // 変更を即座に適用
-        });
-    }
-    if (notificationCheckbox) {
-        notificationCheckbox.addEventListener('change', (event) => saveSetting(SETTINGS_KEYS.NOTIFICATIONS_ENABLED, event.target.checked));
-    }
+      // アニメーションをリセットして再開
+      imageMarqueeContent.style.animation = 'none';
+      void imageMarqueeContent.offsetWidth; // 強制的にリフロー
+      imageMarqueeContent.style.animation = `scrollImage var(--image-scroll-duration) linear infinite`;
+      console.log("画像スクロールアニメーションを開始しました。");
 
-    // ページ読み込み時に設定をロード
-    loadSettings();
+    })
+    .catch(error => {
+      console.error("画像ロードまたは処理中に致命的なエラーが発生しました:", error);
+    });
+
+  }, 0);
+
+  document.getElementById('startClaimButton').addEventListener('click', () => {
+    console.log('「クレーム対応開始」が選択されました。');
+  });
+
+  document.getElementById('customerSettingsButton').addEventListener('click', () => {
+    console.log('「設定」が選択されました。');
+  });
+
+  // 「カスタマーマスターとは？」ボタンのイベントリスナー
+  // aboutGameButtonがnullでないことを確認してからイベントリスナーを追加
+  if (aboutGameButton) {
+    aboutGameButton.addEventListener('click', () => {
+      console.log('「カスタマーマスターとは？」ボタンがクリックされました。');
+      if (gameDescriptionModal) { // gameDescriptionModalもnullでないことを確認
+        gameDescriptionModal.classList.add('visible');
+      } else {
+        console.error("gameDescriptionModal 要素が見つかりません。");
+      }
+    });
+    console.log("「カスタマーマスターとは？」ボタンにイベントリスナーを追加しました。");
+  } else {
+    console.error("aboutGameButton 要素が見つかりません。");
+  }
+
+  // モーダルを閉じるイベントリスナー
+  if (modalCloseButton) {
+    modalCloseButton.addEventListener('click', () => {
+      console.log('モーダル閉じるボタンがクリックされました。');
+      if (gameDescriptionModal) {
+        gameDescriptionModal.classList.remove('visible');
+      }
+    });
+    console.log("モーダル閉じるボタンにイベントリスナーを追加しました。");
+  } else {
+    console.error("modalCloseButton 要素が見つかりません。");
+  }
+
+  // モーダルのオーバーレイ部分をクリックしても閉じるようにする
+  if (gameDescriptionModal) {
+    gameDescriptionModal.addEventListener('click', (event) => {
+      if (event.target === gameDescriptionModal) {
+        console.log('モーダルオーバーレイがクリックされました。');
+        gameDescriptionModal.classList.remove('visible');
+      }
+    });
+    console.log("モーダルオーバーレイにイベントリスナーを追加しました。");
+  }
 });

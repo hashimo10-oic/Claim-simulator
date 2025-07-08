@@ -22,17 +22,6 @@
         <h1 class="main-title text-center mb-8">設定</h1>
 
         <div class="space-y-6 setting-group">
-            <!-- 音量設定 -->
-            <div class="setting-item">
-                <label for="bgmVolume" class="block text-gray-700 text-lg font-semibold mb-2">BGM音量</label>
-                <input type="range" id="bgmVolume" min="0" max="1" step="0.1" value="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-            </div>
-
-            <div class="setting-item">
-                <label for="sfxVolume" class="block text-gray-700 text-lg font-semibold mb-2">効果音量</label>
-                <input type="range" id="sfxVolume" min="0" max="1" step="0.1" value="0.7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-            </div>
-
             <!-- 動画設定 -->
             <div class="setting-item">
                 <label class="block text-gray-700 text-lg font-semibold mb-2">動画設定</label>
@@ -43,13 +32,13 @@
                 </label>
             </div>
 
-            <!-- 音楽設定 -->
+            <!-- 音楽設定（効果音のオンオフ機能とする） -->
             <div class="setting-item">
                 <label class="block text-gray-700 text-lg font-semibold mb-2">音楽設定</label>
                 <label for="musicToggle" class="inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="musicToggle" class="sr-only peer">
                     <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    <span class="ms-3 text-gray-700 text-base">BGM/効果音を有効にする</span>
+                    <span class="ms-3 text-gray-700 text-base">効果音を有効にする</span>
                 </label>
             </div>
 
@@ -81,67 +70,8 @@
       あなたのブラウザはオーディオタグをサポートしていません。
     </audio>
 
-    <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const SETTINGS_KEYS = {
-      VIDEO_ENABLED: 'videoEnabled',
-      MUSIC_ENABLED: 'musicEnabled',
-      COLOR_INVERSION_ENABLED: 'colorInversionEnabled',
-      BGM_VOLUME: 'bgmVolume', // BGM音量も読み込む
-      SFX_VOLUME: 'sfxVolume'  // 効果音量も読み込む
-    };
-
-    // 色反転設定の適用
-    const savedColorInversionEnabled = localStorage.getItem(SETTINGS_KEYS.COLOR_INVERSION_ENABLED);
-    if (savedColorInversionEnabled === 'true') {
-      document.body.classList.add('color-inverted');
-    } else {
-      document.body.classList.remove('color-inverted');
-    }
-
-    // 音楽設定の適用 (BGM)
-    const savedMusicEnabled = localStorage.getItem(SETTINGS_KEYS.MUSIC_ENABLED);
-    const backgroundMusic = document.getElementById('backgroundMusic');
-    if (backgroundMusic) {
-      if (savedMusicEnabled === 'false') {
-        backgroundMusic.muted = true;
-        backgroundMusic.pause(); // ミュートだけでなく停止もする
-      } else {
-        backgroundMusic.muted = false;
-        const savedBGMVolume = localStorage.getItem(SETTINGS_KEYS.BGM_VOLUME);
-        if (savedBGMVolume !== null) {
-          backgroundMusic.volume = parseFloat(savedBGMVolume);
-        }
-        // ユーザーインタラクションがないとplay()がブロックされる場合があるので、
-        // 各ページのbodyクリックイベントでplay()を試みるロジックと連携
-        backgroundMusic.play().catch(error => {
-          // 自動再生がブロックされた場合でもエラーをコンソールに出力する
-          console.warn("BGMの自動再生がブロックされました (共通スクリプト):", error);
-        });
-      }
-    }
-
-    // 動画設定の適用 (game_over.html, game_clear.html の全画面動画)
-    const savedVideoEnabled = localStorage.getItem(SETTINGS_KEYS.VIDEO_ENABLED);
-    const fullscreenVideoContainer = document.getElementById('fullscreenVideoContainer');
-    const fullscreenVideo = document.getElementById('fullscreenGameOverVideo') || document.getElementById('fullscreenGameClearVideo');
-
-    if (fullscreenVideoContainer && fullscreenVideo) {
-      if (savedVideoEnabled === 'false') {
-        fullscreenVideoContainer.classList.add('hidden-content');
-        fullscreenVideo.pause();
-        const mainContent = document.getElementById('mainGameOverContent') || document.getElementById('mainGameClearContent');
-        if (mainContent) {
-          mainContent.classList.remove('hidden-content');
-        }
-      } else {
-        fullscreenVideoContainer.classList.remove('hidden-content'); // 表示を確実にする
-      }
-    }
-  });
-</script>
-
-
+    <!-- 共通設定読み込みスクリプト -->
+    <script src="js/global_settings.js"></script>
     <script src="js/setting.js"></script>
 </body>
 </html>
