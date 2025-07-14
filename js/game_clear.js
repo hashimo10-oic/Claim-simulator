@@ -34,11 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     changeDifficultyButton.addEventListener('click', () => {
         console.log('「次の難易度へ」が選択されました。');
-        window.location.href = "Level.html"; // 難易度選択画面へ遷移
+        window.location.href = "../html/difficulty_settings.html"; // 難易度選択画面へ遷移
     });
 
     homeButton.addEventListener('click', () => {
         console.log('「メインメニューへ」が選択されました。');
-        window.location.href = "start.html"; // タイトル画面へ遷移
+        window.location.href = "../html/start.html"; // タイトル画面へ遷移
     });
 });
