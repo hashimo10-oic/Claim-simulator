@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const isRare = Math.random() < 0.05;
 
   const generateSingleItemText = (message, repeatCount = 20) => {
-    return Array(repeatCount).fill(message).join('　　');
+    return Array(repeatCount).fill(message).join('  ');
   };
 
   let actualTextForScrolling = "";
