@@ -39,10 +39,14 @@
             <span>メッセージ生成中...</span>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-4">
-            <textarea id="myMessageInput" class="my-message-input flex-grow" placeholder="ここにメッセージを入力..."></textarea>
-            <button id="sendMessageButton" class="send-button">送信</button>
-            <button id="getHintButton" class="hint-button">✨ヒントをもらう</button> </div>
+        <div class="input-area">
+            <div class="textarea-send-group flex items-end gap-2">
+                <textarea id="myMessageInput" class="my-message-input flex-grow" placeholder="ここにメッセージを入力..."></textarea>
+                <button id="sendMessageButton" class="send-button">送信</button>
+            </div>
+             <button id="getHintButton" class="hint-button mt-2">✨ヒントをもらう</button>
+            <button id="showHintAgainButton" class="hint-button mt-2 hidden">ヒントを再表示</button>
+        </div>
     </div>
 
     <div id="settingsModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-50">
@@ -69,6 +73,19 @@
                     あきらめる
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="hintContainer" class="hidden fixed bottom-4 right-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-lg shadow-lg z-40 max-w-sm w-11/12">
+        <div class="relative">
+            <div class="flex items-start">
+                <div class="py-1 text-xl"><i class="fas fa-lightbulb"></i></div>
+                <div class="ml-3">
+                    <p class="font-bold">ヒント</p>
+                    <div id="hintText" class="text-sm"></div>
+                </div>
+            </div>
+            <button id="closeHintButton" class="absolute -top-2 -right-2 text-xl font-bold text-yellow-800 hover:text-yellow-900">&times;</button>
         </div>
     </div>
 
