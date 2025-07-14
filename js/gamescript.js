@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let storedHint = null;
 
     const customerImageList = [
-        'images/icon1.png', 'images/icon2.png', 'images/icon3.png',
-        'images/icon4.png', 'images/icon5.png'
+        '../images/icon1.png', '../images/icon2.png', '../images/icon3.png',
+        '../images/icon4.png', '../images/icon5.png'
     ];
 
     function getRelativePath(targetFile) {
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (currentHP <= 0) {
             clearInterval(gameInterval);
-            showAlert('HPが0になりました！ゲームオーバー...', 'error');
+            showAlert('HPが0になりました!ゲームオーバー...', 'error');
             setTimeout(() => window.location.href = getRelativePath('game_over.html'), 1500);
         }
     }
