@@ -28,8 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
       if (savedBGMVolume !== null) {
         backgroundMusic.volume = parseFloat(savedBGMVolume);
       }
-      backgroundMusic.play().catch(error => {
-        console.warn("BGMの自動再生がブロックされました (共通スクリプト):", error);
+      // BGM再生を試みる関数
+      const tryPlayBGM = () => {
+        // BGMが有効かつ一時停止中の場合のみ再生を試みる
+        if (backgroundMusic.paused && !backgroundMusic.muted) {
+          backgroundMusic.play().then(() => {
+            console.log("BGMの自動再生を試みました (global_settings.js)。");
+          }).catch(error => {
+            console.warn("BGMの自動再生がブロックされました (global_settings.js):", error);
+            // ここでユーザーに再生を促すUIを表示することもできる
+          });
+        }
+      };
+
+      // DOMContentLoaded後、少し遅れて再生を試みる
+      // これはブラウザがオーディオ要素を完全に準備する時間を与えるため
+      setTimeout(tryPlayBGM, 100); // 100msの遅延
+
+      // ユーザーがページをクリックしたときにBGM再生を試みる（フォールバック）
+      // このリスナーは一度だけではなく、BGMが有効な限り常に機能する
+      document.body.addEventListener('click', () => {
+        tryPlayBGM();
       });
     }
   }

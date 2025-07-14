@@ -3,6 +3,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const fullscreenGameOverVideo = document.getElementById('fullscreenGameOverVideo');
   const mainGameOverContent = document.getElementById('mainGameOverContent');
 
+  // 動画ソースの定義とランダム選択ロジックを統合
+  const videoSources = [
+      'mv/game_over.mp4',
+      'mv/game_over2.mp4',
+      'mv/game_over3.mp4',
+      'mv/game_over4.mp4'
+  ];
+  const randomIndex = Math.floor(Math.random() * videoSources.length);
+  const selectedVideoSource = videoSources[randomIndex];
+
+  if (fullscreenGameOverVideo) {
+      fullscreenGameOverVideo.src = selectedVideoSource; // 動画ソースを設定
+      // fullscreenGameOverVideo.loop は削除済み
+      
+      // 音量をlocalStorageから読み込む（存在すれば）
+      const savedBGMVolume = localStorage.getItem('bgmVolume'); // BGMと同じボリューム設定を使う例
+      if (savedBGMVolume !== null) {
+          fullscreenGameOverVideo.volume = parseFloat(savedBGMVolume);
+      } else {
+          fullscreenGameOverVideo.volume = 0.5; // デフォルトの音量
+      }
+  } else {
+      console.error("fullscreenGameOverVideo 要素が見つかりません。");
+  }
+
   // localStorageから動画設定を読み込む
   const SETTINGS_KEYS = {
     VIDEO_ENABLED: 'videoEnabled'
@@ -75,17 +100,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const rareMessage = "橋本社長も大慌て！";
   const rareProbability = 0.005;
   const messageElement = document.getElementById('randomMessage');
+  const containerElement = document.querySelector('.container'); // container要素を取得
+  console.log("messageElement found:", messageElement);
+  
   const isRare = Math.random() < rareProbability;
   let selectedMessage;
 
   if (isRare) {
       selectedMessage = rareMessage;
       messageElement.classList.add('rare-message');
+      if (containerElement) {
+          containerElement.classList.add('rare-background'); // レア背景を適用
+      }
   } else {
       const randomIndex = Math.floor(Math.random() * messages.length);
       selectedMessage = messages[randomIndex];
-      messageElement.classList.remove('rare-message');
+      messageElement.classList.remove('rare-message'); // 通常メッセージの場合はレアスタイルを削除
+      if (containerElement) {
+          containerElement.classList.remove('rare-background'); // レア背景を削除
+      }
   }
+  console.log("selectedMessage:", selectedMessage);
   messageElement.textContent = selectedMessage;
 
   // 既存のボタンイベントハンドラ

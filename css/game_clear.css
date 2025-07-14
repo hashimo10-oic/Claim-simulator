@@ -12,6 +12,17 @@ body {
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
+  /* 指差しカーソルを追加するよ */
+  cursor: pointer;
+}
+
+/* 色反転クラス (setting.cssからコピーして全ページに適用) */
+.color-inverted {
+    filter: invert(100%) !important;
+}
+.color-inverted img,
+.color-inverted video {
+    filter: invert(100%) !important;
 }
 
 /* 全画面動画コンテナのスタイル */
@@ -64,6 +75,22 @@ body {
   border: 1px solid #e2e8f0;
   max-height: 95vh; /* ビューポートの高さの95%に制限 */
   overflow-y: auto; /* コンテンツが溢れる場合はスクロール可能にする */
+}
+
+/* レア背景用スタイル (game_clear用) */
+.container.rare-background {
+    background-color: #f0f4c3; /* 非常に淡い緑がかった黄色 */
+    box-shadow: 0 0 30px rgba(255, 235, 59, 0.5), 0 0 60px rgba(255, 235, 59, 0.3); /* 黄色い光彩 */
+    animation: rareGameClearGlow 2s infinite alternate; /* 脈動する光彩アニメーション */
+}
+
+@keyframes rareGameClearGlow {
+    0% {
+        box-shadow: 0 0 30px rgba(255, 235, 59, 0.5), 0 0 60px rgba(255, 235, 59, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 40px rgba(255, 235, 59, 0.7), 0 0 80px rgba(255, 235, 59, 0.5);
+    }
 }
 
 /* ゲームクリアアイコンのスタイル */
@@ -140,14 +167,18 @@ body {
 
 /* レアメッセージ用スタイル */
 .rare-message {
-    color: #fdd835;
+    color: white; /* 文字色を白に変更 */
     text-shadow:
-        -2px -2px 0 #ffeb3b,
-         2px -2px 0 #ffeb3b,
-        -2px  2px 0 #ffeb3b,
-         2px  2px 0 #ffeb3b,
-        0 0 15px rgba(255, 235, 59, 0.8);
-    animation: rareTextGlow 1.5s ease-in-out infinite alternate;
+        0 0 10px rgba(0, 255, 255, 0.8), /* シアン系の光彩 */
+        0 0 20px rgba(0, 255, 255, 0.6),
+        0 0 30px rgba(0, 255, 255, 0.4);
+    animation: rareTextGlowBlue 1.5s ease-in-out infinite alternate; /* game_overと同じアニメーションを適用 */
+}
+
+/* 新しいレアテキスト光彩アニメーション (game_overからコピー) */
+@keyframes rareTextGlowBlue {
+    0% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6); }
+    100% { text-shadow: 0 0 15px rgba(0, 255, 255, 1), 0 0 25px rgba(0, 255, 255, 0.8); }
 }
 
 /* ボタンのベーススタイル */
@@ -189,7 +220,7 @@ body {
     100% { transform: scale(1.02); text-shadow: 4px 4px 8px rgba(0,0,0,0.3), 0 0 15px rgba(102, 187, 106, 0.7); }
 }
 
-@keyframes rareTextGlow {
+@keyframes rareTextGlow { /* 以前のレアテキスト光彩アニメーションは使用しないが、念のため残す */
     0% { text-shadow: 0 0 8px #ffeb3b, 0 0 15px #ffc107; }
     100% { text-shadow: 0 0 12px #ffeb3b, 0 0 20px #ffc107; }
 }

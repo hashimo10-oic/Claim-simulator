@@ -24,11 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const gameDescriptionModal = document.getElementById('gameDescriptionModal');
   const modalCloseButton = gameDescriptionModal.querySelector('.modal-close-button');
 
+  // デバッグログを追加: 要素が正しく取得されているか確認
+  console.log("aboutGameButton:", aboutGameButton);
+  console.log("gameDescriptionModal:", gameDescriptionModal);
+  console.log("modalCloseButton:", modalCloseButton);
+
+
   const baseTitleText = "カスタマーマスター";
   const baseRareMessages = [
-    "橋本社長考案！カスタマーマスター",
-    "駿之介監督絶賛！カスタマーマスター",
-    "前谷プロが作りました👍カスタマーマスター",
+    "社長考案！カスタマーマスター",
+    "shun監督絶賛！カスタマーマスター",
+    "前プロが作りました👍カスタマーマスター",
     "カスタマーYOUKOUマスター"
   ];
 
@@ -171,22 +177,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('startClaimButton').addEventListener('click', () => {
     console.log('「クレーム対応開始」が選択されました。');
-    // BGMの一時停止ロジックを削除しました
   });
 
   document.getElementById('customerSettingsButton').addEventListener('click', () => {
     console.log('「設定」が選択されました。');
-    // BGMの一時停止ロジックを削除しました
   });
 
-  document.body.addEventListener('click', () => {
-    // 音楽がまだ再生されていない場合（または一時停止中の場合）のみ再生を試みる
-    if (backgroundMusic && backgroundMusic.paused) {
-      backgroundMusic.play().then(() => {
-        console.log("BGMの自動再生を試みました。");
-      }).catch(error => {
-        console.log("BGMの自動再生はブロックされました。", error);
-      });
-    }
-  }, { once: true });
+  // 「カスタマーマスターとは？」ボタンのイベントリスナー
+  // aboutGameButtonがnullでないことを確認してからイベントリスナーを追加
+  if (aboutGameButton) {
+    aboutGameButton.addEventListener('click', () => {
+      console.log('「カスタマーマスターとは？」ボタンがクリックされました。');
+      if (gameDescriptionModal) { // gameDescriptionModalもnullでないことを確認
+        gameDescriptionModal.classList.add('visible');
+      } else {
+        console.error("gameDescriptionModal 要素が見つかりません。");
+      }
+    });
+    console.log("「カスタマーマスターとは？」ボタンにイベントリスナーを追加しました。");
+  } else {
+    console.error("aboutGameButton 要素が見つかりません。");
+  }
+
+  // モーダルを閉じるイベントリスナー
+  if (modalCloseButton) {
+    modalCloseButton.addEventListener('click', () => {
+      console.log('モーダル閉じるボタンがクリックされました。');
+      if (gameDescriptionModal) {
+        gameDescriptionModal.classList.remove('visible');
+      }
+    });
+    console.log("モーダル閉じるボタンにイベントリスナーを追加しました。");
+  } else {
+    console.error("modalCloseButton 要素が見つかりません。");
+  }
+
+  // モーダルのオーバーレイ部分をクリックしても閉じるようにする
+  if (gameDescriptionModal) {
+    gameDescriptionModal.addEventListener('click', (event) => {
+      if (event.target === gameDescriptionModal) {
+        console.log('モーダルオーバーレイがクリックされました。');
+        gameDescriptionModal.classList.remove('visible');
+      }
+    });
+    console.log("モーダルオーバーレイにイベントリスナーを追加しました。");
+  }
 });

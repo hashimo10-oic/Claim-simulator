@@ -3,6 +3,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenGameClearVideo = document.getElementById('fullscreenGameClearVideo');
     const mainGameClearContent = document.getElementById('mainGameClearContent');
 
+    // 動画ソースの定義とランダム選択ロジックを統合
+    const videoSources = [
+        'mv/game_clear.mp4',
+        'mv/game_clear2.mp4',
+        'mv/game_clear3.mp4',
+        'mv/game_clear4.mp4'
+    ];
+    const randomIndex = Math.floor(Math.random() * videoSources.length);
+    const selectedVideoSource = videoSources[randomIndex];
+
+    if (fullscreenGameClearVideo) {
+        fullscreenGameClearVideo.src = selectedVideoSource; // 動画ソースを設定
+        // fullscreenGameClearVideo.loop は削除済み
+        
+        // 音量をlocalStorageから読み込む（存在すれば）
+        const savedBGMVolume = localStorage.getItem('bgmVolume'); // BGMと同じボリューム設定を使う例
+        if (savedBGMVolume !== null) {
+            fullscreenGameClearVideo.volume = parseFloat(savedBGMVolume);
+        } else {
+            fullscreenGameClearVideo.volume = 0.5; // デフォルトの音量
+        }
+    } else {
+        console.error("fullscreenGameClearVideo 要素が見つかりません。");
+    }
+
     // localStorageから動画設定を読み込む
     const SETTINGS_KEYS = {
         VIDEO_ENABLED: 'videoEnabled'
@@ -59,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 🌟 ランダムメッセージの表示処理 (以前のロジックを維持)
+    // 🌟 ランダムメッセージの表示処理
     const messages = [
         "完璧な対応ではないか！",
         "素晴らしい.....いい対応だ",
@@ -77,16 +102,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const rareProbability = 0.005; // 0.5%の確率でレアメッセージが出現するよ
 
     const messageElement = document.getElementById('randomMessage');
+    const containerElement = document.querySelector('.container'); // container要素を取得
+    console.log("messageElement found:", messageElement);
+    
+    const isRare = Math.random() < rareProbability;
+    let selectedMessage;
 
-    // 確率でレアメッセージを表示するか、通常のメッセージを表示するか決めるよ
-    if (Math.random() < rareProbability) {
-        messageElement.textContent = rareMessage;
+    if (isRare) {
+        selectedMessage = rareMessage;
         messageElement.classList.add('rare-message');
+        if (containerElement) {
+            containerElement.classList.add('rare-background'); // レア背景を適用
+        }
     } else {
         const randomIndex = Math.floor(Math.random() * messages.length);
-        messageElement.textContent = messages[randomIndex];
+        selectedMessage = messages[randomIndex];
         messageElement.classList.remove('rare-message'); // 通常メッセージの場合はレアスタイルを削除
+        if (containerElement) {
+            containerElement.classList.remove('rare-background'); // レア背景を削除
+        }
     }
+    console.log("selectedMessage:", selectedMessage);
+    messageElement.textContent = selectedMessage;
 
     // 🎮 ボタン処理
     const changeDifficultyButton = document.getElementById('changeDifficultyButton');

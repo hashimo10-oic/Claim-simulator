@@ -12,11 +12,13 @@ body {
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
+  /* 指差しカーソルを追加するよ */
+  cursor: pointer;
 }
 
 /* 色反転クラス */
 .color-inverted {
-    filter: invert(100%) !important; /* ページ全体の色を反転 - !important を追加 */
+    filter: invert(100%) !important; /* !important を追加 */
 }
 
 /* 色反転時に画像や動画が二重に反転しないように元に戻す */

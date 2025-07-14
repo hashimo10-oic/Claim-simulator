@@ -76,66 +76,7 @@
   </div>
 
   <!-- 共通設定読み込みスクリプト -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const SETTINGS_KEYS = {
-      VIDEO_ENABLED: 'videoEnabled',
-      MUSIC_ENABLED: 'musicEnabled',
-      COLOR_INVERSION_ENABLED: 'colorInversionEnabled',
-      BGM_VOLUME: 'bgmVolume', // BGM音量も読み込む
-      SFX_VOLUME: 'sfxVolume'  // 効果音量も読み込む
-    };
-
-    // 色反転設定の適用
-    const savedColorInversionEnabled = localStorage.getItem(SETTINGS_KEYS.COLOR_INVERSION_ENABLED);
-    if (savedColorInversionEnabled === 'true') {
-      document.body.classList.add('color-inverted');
-    } else {
-      document.body.classList.remove('color-inverted');
-    }
-
-    // 音楽設定の適用 (BGM)
-    const savedMusicEnabled = localStorage.getItem(SETTINGS_KEYS.MUSIC_ENABLED);
-    const backgroundMusic = document.getElementById('backgroundMusic');
-    if (backgroundMusic) {
-      if (savedMusicEnabled === 'false') {
-        backgroundMusic.muted = true;
-        backgroundMusic.pause(); // ミュートだけでなく停止もする
-      } else {
-        backgroundMusic.muted = false;
-        const savedBGMVolume = localStorage.getItem(SETTINGS_KEYS.BGM_VOLUME);
-        if (savedBGMVolume !== null) {
-          backgroundMusic.volume = parseFloat(savedBGMVolume);
-        }
-        // ユーザーインタラクションがないとplay()がブロックされる場合があるので、
-        // 各ページのbodyクリックイベントでplay()を試みるロジックと連携
-        backgroundMusic.play().catch(error => {
-          // 自動再生がブロックされた場合でもエラーをコンソールに出力する
-          console.warn("BGMの自動再生がブロックされました (共通スクリプト):", error);
-        });
-      }
-    }
-
-    // 動画設定の適用 (game_over.html, game_clear.html の全画面動画)
-    const savedVideoEnabled = localStorage.getItem(SETTINGS_KEYS.VIDEO_ENABLED);
-    const fullscreenVideoContainer = document.getElementById('fullscreenVideoContainer');
-    const fullscreenVideo = document.getElementById('fullscreenGameOverVideo') || document.getElementById('fullscreenGameClearVideo');
-
-    if (fullscreenVideoContainer && fullscreenVideo) {
-      if (savedVideoEnabled === 'false') {
-        fullscreenVideoContainer.classList.add('hidden-content');
-        fullscreenVideo.pause();
-        const mainContent = document.getElementById('mainGameOverContent') || document.getElementById('mainGameClearContent');
-        if (mainContent) {
-          mainContent.classList.remove('hidden-content');
-        }
-      } else {
-        fullscreenVideoContainer.classList.remove('hidden-content'); // 表示を確実にする
-      }
-    }
-  });
-</script>
-
+  <script src="js/global_settings.js"></script>
   <script src="js/start.js"></script>
 </body>
 </html>

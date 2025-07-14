@@ -12,6 +12,17 @@ body {
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
+  /* 指差しカーソルを追加するよ */
+  cursor: pointer;
+}
+
+/* 色反転クラス (setting.cssからコピーして全ページに適用) */
+.color-inverted {
+    filter: invert(100%) !important;
+}
+.color-inverted img,
+.color-inverted video {
+    filter: invert(100%) !important;
 }
 
 /* 全画面動画コンテナのスタイル */
@@ -64,6 +75,22 @@ body {
   border: 1px solid #e2e8f0;
   max-height: 95vh; /* ビューポートの高さの95%に制限 */
   overflow-y: auto; /* コンテンツが溢れる場合はスクロール可能にする */
+}
+
+/* レア背景用スタイル */
+.container.rare-background {
+    background-color: #ffebee; /* 非常に淡い赤 */
+    box-shadow: 0 0 30px rgba(229, 57, 53, 0.5), 0 0 60px rgba(229, 57, 53, 0.3); /* 赤い光彩 */
+    animation: rareGameOverGlow 2s infinite alternate; /* 脈動する光彩アニメーション */
+}
+
+@keyframes rareGameOverGlow {
+    0% {
+        box-shadow: 0 0 30px rgba(229, 57, 53, 0.5), 0 0 60px rgba(229, 57, 53, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 40px rgba(229, 57, 53, 0.7), 0 0 80px rgba(229, 57, 53, 0.5);
+    }
 }
 
 /* ゲームオーバーアイコンのスタイル */
@@ -141,15 +168,20 @@ body {
 
 /* レアメッセージ用スタイル */
 .rare-message {
-    color: #000;
+    color: white; /* 文字色を白に変更 */
     text-shadow:
-        -2px -2px 0 #FFFF66,
-         2px -2px 0 #FFFF66,
-        -2px  2px 0 #FFFF66,
-         2px  2px 0 #FFFF66,
-        0 0 15px rgba(255, 255, 102, 0.8);
-    animation: rareTextShake 0.5s ease-in-out infinite alternate;
+        0 0 10px rgba(0, 255, 255, 0.8), /* シアン系の光彩 */
+        0 0 20px rgba(0, 255, 255, 0.6),
+        0 0 30px rgba(0, 255, 255, 0.4);
+    animation: rareTextGlowBlue 1.5s ease-in-out infinite alternate; /* 新しいアニメーションを適用 */
 }
+
+/* 新しいレアテキスト光彩アニメーション */
+@keyframes rareTextGlowBlue {
+    0% { text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6); }
+    100% { text-shadow: 0 0 15px rgba(0, 255, 255, 1), 0 0 25px rgba(0, 255, 255, 0.8); }
+}
+
 
 /* ボタンのベーススタイル */
 .action-button {
@@ -160,7 +192,7 @@ body {
   position: relative;
   overflow: hidden;
   border: none;
-  cursor: pointer;
+  cursor: pointer; /* ボタン自体にも指差しカーソルを維持 */
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
   color: white;
 }
@@ -197,9 +229,3 @@ body {
     75% { transform: translateX(-2px); }
     100% { transform: translateX(0); }
 }
-
-/* 左上に固定配置される小動画のコンテナのスタイルは削除しました */
-/* .video-fixed-container { ... } */
-
-/* 小動画要素自体のスタイルは削除しました */
-/* #gameOverVideo { ... } */
