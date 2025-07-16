@@ -7,6 +7,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const imageMarqueeContainer = document.querySelector('.image-marquee-container');
   const imageMarqueeContent = document.getElementById('imageMarqueeContent');
+
+  window.onload = function() {
+  const audio = document.getElementById('startbgm');
+  const promise = audio.play();
+
+  if (promise !== undefined) {
+    promise.then(_ => {
+      // 自動再生が成功した場合
+      console.log('音声の再生を開始しました。');
+    }).catch(error => {
+      // 自動再生が失敗した場合（ユーザーの操作が必要）
+      console.error('自動再生がブラウザにブロックされました:', error);
+      // ここで「クリックして再生」のようなUIを表示するなどの対応が考えられます。
+    });
+  }
+};
+
   // ユーザーのファイル構造と表示確認に基づき、画像パスを修正しました。
   // start.htmlからの相対パスで、ikariフォルダ内の画像を参照します。
   const imageSources = [
@@ -33,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const baseTitleText = "カスタマーマスター";
   const baseRareMessages = [
     "社長考案！カスタマーマスター",
-    "shun監督絶賛！カスタマーマスター",
+    "shun監督絶賛!カスタマーマスター",
     "前プロが作りました👍カスタマーマスター",
     "カスタマーYOUKOUマスター"
   ];

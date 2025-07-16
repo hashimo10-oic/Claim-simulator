@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 動画ソースの定義とランダム選択ロジックを統合
   const videoSources = [
-      'mv/game_over.mp4',
-      'mv/game_over2.mp4',
-      'mv/game_over3.mp4',
-      'mv/game_over4.mp4'
+      '../movies/game_over.mp4',
+      '../movies/game_over2.mp4',
+      '../movies/game_over3.mp4',
+      '../movies/game_over4.mp4'
   ];
   const randomIndex = Math.floor(Math.random() * videoSources.length);
   const selectedVideoSource = videoSources[randomIndex];

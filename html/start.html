@@ -20,7 +20,7 @@
     </h1>
 
     <div class="space-y-8"> <!-- 間隔を少し広げてゆとりを持たせるよ -->
-      <a href="difficulty_setting.html" class="block mx-auto max-w-xs"> <!-- ボタンの最大幅をmax-w-xsに制限し、中央に配置するよ -->
+      <a href="./difficulty_settings.html" class="block mx-auto max-w-xs"> <!-- ボタンの最大幅をmax-w-xsに制限し、中央に配置するよ -->
         <button id="startClaimButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
           <span class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300 ease-out group-hover:to-blue-700"></span>
           <span class="relative z-10 flex items-center justify-center">
@@ -47,14 +47,6 @@
       </div>
       <!-- 画像スクロールここまで -->
 
-      <!-- BGM用のオーディオタグのパスをmv/startbgm.mp3に修正するよ -->
-      <audio id="backgroundMusic" autoplay loop>
-        <source src="../mv/startbgm.mp3" type="audio/mpeg">
-        あなたのブラウザはオーディオタグをサポートしていません。
-      </audio>
-    </div>
-  </div>
-
   <!-- 「カスタマーマスターとは？」ボタンを画面右下に配置するよ -->
   <button id="aboutGameButton" class="about-button fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-200 ease-in-out text-sm">
     カスタマーマスターとは？
@@ -76,7 +68,7 @@
   </div>
 
   <!-- 共通設定読み込みスクリプト -->
-  <script src="js/global_settings.js"></script>
+  <script src="../js/global_settings.js"></script>
   <script src="../js/start.js"></script>
 </body>
 </html>
