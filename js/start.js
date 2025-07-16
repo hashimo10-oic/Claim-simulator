@@ -10,11 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ユーザーのファイル構造と表示確認に基づき、画像パスを修正しました。
   // start.htmlからの相対パスで、ikariフォルダ内の画像を参照します。
   const imageSources = [
-    'ikari/ikari.png',
-    'ikari/ikari2.png',
-    'ikari/ikari3.png',
-    'ikari/ikari4.png',
-    'ikari/ikari5.png'
+    '../images/icon1.png',
+    '../images/icon2.png',
+    '../images/icon3.png',
+    '../images/icon4.png',
+    '../images/icon5.png'
   ];
 
   const backgroundMusic = document.getElementById('backgroundMusic');
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const isRare = Math.random() < 0.05;
 
   const generateSingleItemText = (message, repeatCount = 20) => {
-    return Array(repeatCount).fill(message).join('　　');
+    return Array(repeatCount).fill(message).join('  ');
   };
 
   let actualTextForScrolling = "";
