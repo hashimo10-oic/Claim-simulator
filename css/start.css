@@ -1,10 +1,8 @@
 body {
   font-family: 'Inter', sans-serif;
-  /* より洗練されたグラデーションと、ごくわずかなパターンを組み合わせるよ */
-  background:
-    linear-gradient(135deg, #e0f7fa 0%, #cce7f0 100%), /* 非常に淡い水色から青への柔らかいグラデーション */
-    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="%23000000" opacity="0.03"/></svg>') repeat; /* ごく小さなドットパターンでテクスチャ感を出すよ */
-  background-size: cover, 20px 20px; /* グラデーションは全体を覆い、パターンは小さく繰り返すよ */
+  /* 背景画像をimages/free.jpgに設定するよ */
+  background: url('../images/free.jpg') no-repeat center center fixed; /* パスを修正 */
+  background-size: cover; /* 画面全体を覆うように拡大・縮小 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -12,14 +10,26 @@ body {
   margin: 0;
   padding: 20px;
   box-sizing: border-box; /* パディングを含めて要素の幅を計算するよ */
+
+  /* ここを標準の指差しカーソルに変更するよ */
+  cursor: pointer; 
+}
+
+/* 色反転クラス (setting.cssからコピーして全ページに適用) */
+.color-inverted {
+    filter: invert(100%) !important;
+}
+.color-inverted img,
+.color-inverted video {
+    filter: invert(100%) !important;
 }
 
 .container {
-  max-width: 600px;
+  max-width: 400px; /* 横幅を400pxに短くしたよ */
   width: 100%;
-  padding: 3rem; /* パディングをさらに増やしてゆとりを持たせるよ */
+  padding: 2rem; /* パディングを微調整したよ */
   border-radius: 1.25rem; /* 角丸を大きくして柔らかさを出すよ */
-  background-color: #ffffff; /* 白い背景を維持 */
+  background-color: rgba(255, 255, 255, 0.8); /* 白で80%の不透明度（20%透明）に設定 */
   /* 影をより多層的で柔らかいものに変更し、高級感を出すよ */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0; /* 薄いボーダーを維持 */
@@ -28,12 +38,12 @@ body {
 
 /* 通常背景（デザイン変更により、ほぼcontainerと同じになるが、念のため残す） */
 .normal-background {
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.8); /* ここも半透明に合わせる */
 }
 
 /* レアな背景用（より鮮やかでわくわくするアクセントカラーに） */
 .rare-background {
-    background: linear-gradient(45deg, #a78bfa, #c4b5fd); /* 柔らかい紫のグラデーション */
+    background: linear-gradient(45deg, rgba(167, 139, 250, 0.8), rgba(196, 181, 253, 0.8)); /* グラデーションも半透明に */
     border: 1px solid #8b5cf6; /* 濃い紫のボーダー */
     box-shadow: 0 20px 50px rgba(139, 92, 246, 0.3); /* 紫系の影 */
 }
@@ -63,7 +73,6 @@ body {
 .marquee-content {
     display: inline-flex; /* テキストの幅に合わせて要素の幅を調整するよ */
     animation: scrollText var(--scroll-duration) linear infinite; /* アニメーションを適用するよ */
-    /* JSで初期オフセットを設定するため、ここではleft: 0; は設定しないよ */
 }
 
 /* スクロールするテキストアイテム */
@@ -140,17 +149,16 @@ body {
   margin-bottom: 2rem; /* 下の要素との間隔 */
   border-radius: 0.75rem; /* 角丸 */
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* 軽い影 */
-  background-color: #f8fafc; /* 非常に薄いグレーの背景 */
+  background-color: rgba(248, 250, 252, 0.8); /* 背景も半透明に */
 }
 
 /* 画像スクロールコンテンツのスタイル */
 .image-marquee-content {
   display: flex; /* 画像を横並びにする */
   height: 100%;
-  /* アニメーションの方向を左から右に変更 */
-  animation: scrollImage var(--image-scroll-duration) linear infinite; /* アニメーションを適用 */
-  /* 初期位置をCSS変数で設定 */
-  transform: translateX(var(--initial-image-offset)) translateZ(0); /* ハードウェアアクセラレーションを強制 */
+  animation: scrollImage var(--image-scroll-duration) linear infinite;
+  animation-direction: normal; /* 左から右へ流れるように明示的に設定 */
+  transform: translateZ(0); /* ハードウェアアクセラレーションを強制 */
 }
 
 /* スクロールする画像アイテムのスタイル */
@@ -170,11 +178,79 @@ body {
 
 /* 画像スクロールのキーフレームアニメーション */
 @keyframes scrollImage {
-  /* 左から右へ流れるように変更 */
+  /* 左から右へ流れるように定義 */
   0% {
-    transform: translateX(var(--initial-image-offset)) translateZ(0); /* JSで設定される初期オフセットから開始 */
+    transform: translateX(var(--image-scroll-distance)) translateZ(0); /* --image-scroll-distance は負の値 */
   }
   100% {
-    transform: translateX(0) translateZ(0); /* 0pxまで移動 */
+    transform: translateX(0) translateZ(0);
   }
+}
+
+/* 「カスタマーマスターとは？」ボタンのスタイル */
+.about-button {
+  z-index: 100; /* 他の要素の上に表示 */
+  font-size: 0.875rem; /* text-sm */
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  border-radius: 9999px; /* rounded-full */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  transition: all 0.2s ease-in-out; /* transition-all duration-200 ease-in-out */
+  cursor: pointer;
+}
+
+.about-button:hover {
+  transform: translateY(-2px); /* 少し浮き上がる効果 */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); /* 影を強調 */
+}
+
+/* モーダルオーバーレイのスタイル */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* 半透明の黒背景 */
+  display: none; /* デフォルトで非表示にする */
+  justify-content: center; /* 水平方向中央寄せ */
+  align-items: center; /* 垂直方向中央寄せ */
+  z-index: 1000; /* 最前面に表示 */
+  opacity: 0; /* 初期状態は透明 */
+  transition: opacity 0.3s ease-in-out; /* フェードイン/アウト */
+}
+
+.modal-overlay.visible {
+  display: flex; /* 'visible'クラスが付いたら表示 */
+  opacity: 1;
+}
+
+/* モーダルコンテンツのスタイル */
+.modal-content {
+  max-width: 700px; /* 横幅を700pxに広げたよ */
+  width: 90%; /* レスポンシブ対応 */
+  padding: 2rem; /* p-6 */
+  border-radius: 0.5rem; /* rounded-lg */
+  background-color: rgba(255, 255, 255, 0.95); /* モーダルも少し半透明に */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* shadow-xl */
+  transform: translateY(-20px); /* 少し上から現れるように */
+  transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay.visible .modal-content {
+  transform: translateY(0); /* 通常位置に移動 */
+}
+
+/* モーダル閉じるボタンのスタイル */
+.modal-close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem; /* text-2xl */
+  line-height: 1;
+  color: #a0aec0; /* gray-500 */
+  transition: color 0.2s ease-in-out;
+}
+
+.modal-close-button:hover {
+  color: #4a5568; /* gray-700 */
 }

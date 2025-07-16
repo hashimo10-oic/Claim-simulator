@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ゲームクリア！ - 業務成功</title>
+    <link rel="stylesheet" href="../css/game_clear.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesomeアイコンライブラリを読み込むよ。ボタンアイコンに使うね -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- 全画面動画コンテナ - ページ読み込み時に最初に表示される -->
+    <div id="fullscreenVideoContainer" class="fullscreen-video-container">
+        <video id="fullscreenGameClearVideo" class="fullscreen-video" autoplay muted playsinline>
+            <!-- 動画ソースはjs/game_clear.jsで設定されるよ -->
+            <!-- <source src="./video/gameclear.mp4" type="video/mp4"> -->
+            あなたのブラウザは動画タグをサポートしていません。
+        </video>
+    </div>
+
+    <!-- メインのゲームクリアコンテンツ - 動画終了後に表示される -->
+    <div id="mainGameClearContent" class="main-game-clear-content hidden-content">
+        <div class="container bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+           <!-- ゲームクリアアイコンを追加 -->
+           <div class="game-clear-icon-container text-center mb-6">
+               <i class="fas fa-check-circle text-green-600 text-6xl animate-bounce-in"></i>
+           </div>
+
+           <!-- ここに「Game Clear!」テキストを追加 -->
+           <h2 class="game-clear-text text-center mb-4">Game Clear!</h2>
+
+           <h1 id="randomMessage" class="main-title text-center mb-8">完璧な対応だ！</h1>
+
+            <div class="space-y-8">
+                <a href="difficulty_settings.html" class="block mx-auto max-w-sm">
+                    <button id="changeDifficultyButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-300 ease-out group-hover:to-emerald-700"></span>
+                        <spdan class="relative z-10 flex items-center justify-center">
+                            <i class="fas fa-level-up-alt mr-3"></i>次の難易度へ
+                        </span>
+                    </button>
+                </a>
+
+                <a href="start.html" class="block mx-auto max-w-sm">
+                    <button id="homeButton" class="action-button w-full p-6 text-white font-bold text-2xl relative overflow-hidden group">
+                        <span class="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 ease-out group-hover:to-indigo-700"></span>
+                        <span class="relative z-10 flex items-center justify-center">
+                            <i class="fas fa-home mr-3"></i>メインメニューへ
+                        </span>
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 共通設定読み込みスクリプト -->
+    <script src="../js/global_settings.js"></script>
+    <script src="../js/game_clear.js"></script>
+</body>
+</html>
