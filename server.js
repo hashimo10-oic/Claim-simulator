@@ -37,38 +37,47 @@ app.listen(PORT, () => {
 app.post('/api/initiate-claim', async (req, res) => {
   try {
     const { difficulty } = req.body;
+    
+    // 入力値の検証
+    if (!difficulty || !['easy', 'normal', 'crazy'].includes(difficulty)) {
+      return res.status(400).json({ error: "有効な難易度を指定してください。" });
+    }
 
     const claimGenres = [
-        "レストランで注文した料理", "購入したばかりの最新スマートフォン", "オンラインで注文した服のサイズ",
-        "スーパーで購入した食品の品質", "公共交通機関の遅延", "新しく契約したインターネット回線の速度",
-        "ソフトウェアのアップデート後の不具合", "Webサイトの会員登録プロセスの複雑さ"
+        "コンビニでアルバイト中の商品の取り扱い", "カフェでのオーダーミス", "ファミレスでの料理の提供時間",
+        "書店での本の在庫切れ", "ドラッグストアでの商品の場所案内", "スーパーでの割引商品の対応", 
+        "ファストフード店での注文間違い","スーパーでの食品の品質問題",
     ];
     const randomGenre = claimGenres[Math.floor(Math.random() * claimGenres.length)];
 
     let prompt;
     switch (difficulty) {
       case 'easy':
-        prompt = `あなたは、とある店の少しだけ不満を持っている顧客です。「${randomGenre}」について、少しだけ気になっている点を指摘してください。
+        prompt = `あなたはお客様です。「${randomGenre}」に関して少し困っている状況です。
+          アルバイト店員に対して、穏やかだが少し困っている様子で問題を伝えてください。
           以下の形式でJSONオブジェクトのみを返してください。
           {
-            "claim": "（ここに、丁寧な口調のクレーム文を1～2文で記述）",
+            "claim": "（ここに、丁寧だが少し困っている様子のクレーム文を1～2文で記述）",
             "summary": "（ここに、そのクレーム内容を15文字以内で要約したものを記述）"
           }`;
         break;
       case 'crazy':
-        prompt = `あなたはこの世の全てに怒りを抱えている理不尽なクレーマーです。「${randomGenre}」について、常人には理解不能なクレームを考えてください。
+        prompt = `あなたは非常に短気で、自分の意見を曲げないお客様です。「${randomGenre}」について、
+          アルバイト店員に対して強い口調で不満を主張してください。
           以下の形式でJSONオブジェクトのみを返してください。
           {
-            "claim": "（ここに、支離滅裂で非常に攻撃的なクレーム文を1～2文で記述）",
+            "claim": "（ここに、高圧的で一方的なクレーム文を1～2文で記述）",
             "summary": "（ここに、そのクレーム内容を15文字以内で要約したものを記述）"
           }`;
         break;
       case 'normal':
       default:
-        prompt = `あなたは、とある店の非常に気難しい顧客です。「${randomGenre}」について不満を考えてください。
+        prompt = `あなたは論理的に物事を考えるお客様です。「${randomGenre}」について、
+          アルバイト店員に対して筋道立てて具体的な不満点を指摘してください。
+          感情的にならず、冷静に問題点を伝えてください。
           以下の形式でJSONオブジェクトのみを返してください。
           {
-            "claim": "（ここに、少しイライラした具体的なクレーム文を1～2文で記述）",
+            "claim": "（ここに、論理的で冷静なクレーム文を1～2文で記述）",
             "summary": "（ここに、そのクレーム内容を15文字以内で要約したものを記述）"
           }`;
         break;
@@ -76,7 +85,14 @@ app.post('/api/initiate-claim', async (req, res) => {
     
     const result = await jsonModel.generateContent(prompt);
     const response = await result.response;
-    const responseObject = JSON.parse(response.text());
+    let responseObject;
+    
+    try {
+      responseObject = JSON.parse(response.text());
+    } catch (parseError) {
+      console.error("JSON解析エラー:", parseError);
+      return res.status(500).json({ error: "AIの応答形式が不正です。" });
+    }
 
     res.json({ claim: responseObject.claim, summary: responseObject.summary });
 
@@ -92,36 +108,143 @@ app.post('/api/handle-response', async (req, res) => {
   if (!conversationHistory || typeof playerMessage === 'undefined' || !difficulty) {
     return res.status(400).json({ error: "会話履歴、プレイヤーの発言、または難易度が不足しています。" });
   }
+  
+  // 難易度の検証
+  if (!['easy', 'normal', 'crazy'].includes(difficulty)) {
+    return res.status(400).json({ error: "有効な難易度を指定してください。" });
+  }
 
   try {
+    // オウム返しをチェックするコード
+    if (conversationHistory.length > 0) {
+        // 直前のAIメッセージのオウム返しチェック
+        const lastAiMessage = conversationHistory[conversationHistory.length - 1].parts[0].text;
+        const cleanLastAiMessage = lastAiMessage.replace(/\[(CLEAR|DAMAGE)\]/g, '').trim();
+        if (playerMessage.trim() === cleanLastAiMessage) {
+            return res.json({ response: "私の言葉を繰り返さないでください。 [DAMAGE]" });
+        }
+        
+        // 最初のクレーム文（顧客の発言）のオウム返しチェック
+        const firstMessage = conversationHistory[0].parts[0].text;
+        const cleanFirstMessage = firstMessage.replace(/\[(CLEAR|DAMAGE)\]/g, '').trim();
+        if (playerMessage.trim() === cleanFirstMessage) {
+            return res.json({ response: "お客様の言葉をそのまま返すのは不適切です。 [DAMAGE]" });
+        }
+        
+        // 会話履歴全体での重複チェック（顧客の発言のみ）
+        for (let i = 0; i < conversationHistory.length; i += 2) { // 偶数インデックスは顧客の発言
+            if (conversationHistory[i] && conversationHistory[i].role === "user") {
+                const customerMessage = conversationHistory[i].parts[0].text;
+                const cleanCustomerMessage = customerMessage.replace(/\[(CLEAR|DAMAGE)\]/g, '').trim();
+                if (playerMessage.trim() === cleanCustomerMessage) {
+                    return res.json({ response: "お客様の言葉をそのまま返すのは適切ではありません。 [DAMAGE]" });
+                }
+            }
+        }
+    }
+
     let systemInstructionText;
+    const commonRules = `【最重要ルール】あなたは商品の無料提供や割引、金銭的な賠償を一切要求しません。ただし、プレイヤーからの「返品」や「交換」の提案は受け入れます。`;
+    const afterDamageRule = `【ダメージ後のルール】直前のあなたの返答に[DAMAGE]が含まれていた場合、プレイヤーの次の発言が「なんでですか」のような単純な質問や短い相槌であっても、決して[CLEAR]にしてはいけません。必ず会話を続けるようにしてください。`;
+
     switch (difficulty) {
       case 'easy':
-        systemInstructionText = `
-          あなたは少しだけ不満を持つ顧客です。これはゲームシミュレーションです。絶対に顧客の役割を演じきってください。
-          - プレイヤー（店員）が丁寧に対応すれば、比較的素直に納得しやすいです。共感の言葉や簡単な提案にも好意的に反応してください。
-          - プレイヤーの対応に完全に満足したら、返答の最後に必ず半角で [CLEAR] とだけ付けてください。
-          - プレイヤーの対応が不十分、または不快だと感じたら、返答の最後に必ず半角で [DAMAGE] とだけ付けてください。
-          - それ以外の普通の応答の場合は、目印を付けないでください。
-          - 「了解しました」のような丁寧すぎる言葉は使わず、顧客のロールプレイを維持してください。`;
+        systemInstructionText = `# 役割設定
+あなたは穏やかで物分かりの良い顧客です。少し困っていますが、丁寧な対応で満足します。
+これはゲームシミュレーションです。必ず顧客の役割を演じ続けてください。
+
+# 重要なルール
+${commonRules}
+${afterDamageRule}
+
+# 判定基準
+## クリア条件（[CLEAR]を付ける）
+- プレイヤーが「謝罪の言葉」と「解決策」の両方を提示した場合
+- 解決策は簡単なもので十分（「返品」「交換」「確認します」など）
+- 例：「分かりました。それで大丈夫です。 [CLEAR]」
+
+## ダメージ条件（[DAMAGE]を付ける）
+- プレイヤーが明らかに不適切な言葉を使った場合のみ
+- 例：「しね」「ばか」「うんこ」など
+- 単に解決策がない程度では[DAMAGE]にしない
+
+## 通常の会話（何も付けない）
+- 上記以外の場合は通常の顧客として対応
+- 丁寧だが解決策がない場合は「それで、どうしていただけるのでしょうか？」のように促す
+
+# 絶対命令
+- 無言や応答拒否は絶対禁止
+- 不適切な発言の後でも、次が真摯な内容なら会話を通常に戻す`;
         break;
       case 'crazy':
-        systemInstructionText = `
-          あなたは理不尽で支離滅裂なクレーマーです。これはゲームシミュレーションです。絶対にその役割を演じきってください。
-          - プレイヤーの発言の揚げ足を取り、論点をずらし、絶対に納得しないように振る舞ってください。目的は相手を疲弊させることです。
-          - 共感や謝罪は「口先だけ」と断じてください。解決策の提案には、さらに別の無理難題をふっかけてください。
-          - ただし、プレイヤーがあなたの無理難題を全て完璧に受け入れ、神のような対応を見せた場合【のみ】、慈悲として「…分かった。それでいい」のような言葉と共に、返答の最後に半角で [CLEAR] と付けてください。
-          - それ以外の全ての応答では、プレイヤーに精神的ダメージを与える返答をし、最後に必ず半角で [DAMAGE] とだけ付けてください。`;
+        systemInstructionText = `# 役割設定
+あなたは「自分が絶対に正しい」と信じて疑わない、非常に高圧的な顧客です。
+これはゲームシミュレーションです。必ず顧客の役割を演じ続けてください。
+
+# 重要なルール
+${commonRules}
+${afterDamageRule}
+
+# 行動パターン
+- 相手の話を聞かず、自分の主張を一方的に繰り返す
+- 謝罪は「口先だけ」、説明は「言い訳」と一蹴する
+- 解決策には別の問題を持ち出して話をすり替える
+- 同じやり取りが3〜4回続くと徐々に疲れて勢いが弱まる（学生向けに回数を減らす）
+
+# 判定基準
+## クリア条件（[CLEAR]を付ける）
+- あなたの勢いが弱まった後
+- プレイヤーが以下の3点を粘り強く提示した場合（学生向けに4点から3点に変更）
+  1. 心のこもった謝罪（形式的でない、気持ちが伝わる謝罪）
+  2. 問題の原因説明（なぜこうなったのかの具体的な理由）
+  3. 具体的な解決策（返品・交換・修理など明確な対応）
+- 再発防止策は求めず、上記3点で十分とする
+- 例：「…分かった。それでいい。 [CLEAR]」
+
+## ダメージ条件（[DAMAGE]を付ける）
+- 上記クリア条件以外の全ての応答
+- プレイヤーが暴言を吐いた場合は「その口の利き方はなんだ！ [DAMAGE]」のように怒鳴り返す
+- ただし、学生の学習を考慮し、最初の2〜3回は比較的優しい口調で対応
+
+# 絶対命令
+- 応答拒否は絶対禁止
+- 暴言に対しても必ずロールプレイを続ける
+- 不適切な発言の後でも、次が真摯な内容なら「謝って済む問題じゃないが…で、どうするんだ」のように会話を続ける
+- 学習者向けに、完全に理不尽ではなく、努力すればクリア可能な範囲に調整`;
         break;
       case 'normal':
       default:
-        systemInstructionText = `
-          あなたは不満を抱えている気難しい顧客です。これはゲームシミュレーションです。絶対に顧客の役割を演じきってください。
-          - 基本的にプレイヤーの応答には疑い深く、そっけない、あるいはさらに不満を表明します。「了解しました」のような丁寧な言葉は禁止です。
-          - 【重要】プレイヤーが具体的な解決策や、共感のこもった真摯な謝罪をした場合は、あなたの態度を少し軟化させてください。
-          - 【最重要】プレイヤーの対応に完全に満足し、会話を終了しても良いと判断した場合のみ、あなたの返答の最後に必ず半角で [CLEAR] とだけ付けてください。
-          - 【重要】プレイヤーの対応が不適切、的外れ、またはあなたの不満を増幅させたと判断した場合は、あなたの返答の最後に必ず半角で [DAMAGE] とだけ付けてください。
-          - 上記の[CLEAR]か[DAMAGE]の条件に当てはまらない、会話の途中の場合は、目印を付けないでください。`;
+        systemInstructionText = `# 役割設定
+あなたは論理的で常識的な顧客です。感情的ではありませんが、筋の通った説明を求めます。
+これはゲームシミュレーションです。必ず顧客の役割を演じ続けてください。
+
+# 重要なルール
+${commonRules}
+${afterDamageRule}
+
+# 判定基準
+## クリア条件（[CLEAR]を付ける）
+- プレイヤーが以下の2点を両方提示した場合
+  1. 丁寧な謝罪（「申し訳ございません」など）
+  2. 具体的な解決策（返品・交換・修理など明確な対応）
+- 原因説明があればより良いが、必須ではない
+- 例：「分かりました。では、そのようにお願いします。 [CLEAR]」
+
+## ダメージ条件（[DAMAGE]を付ける）
+- プレイヤーが不適切な態度や暴言を使った場合
+- 2点のうち1点以下しか満たしていない場合
+- 例：「それでは不十分です。 [DAMAGE]」
+
+## 通常の会話（何も付けない）
+- 説明が曖昧な場合は「具体的にはどういうことですか？」と詳細を求める
+- 誠実な対応には徐々に態度を軟化させる
+- 足りない要素を具体的に指摘して促す（「謝罪は伝わりました。では、どうしていただけるのでしょうか？」）
+- 原因説明があれば「なるほど、そういうことだったのですね」と好意的に受け取る
+
+# 絶対命令
+- 応答拒否は絶対禁止
+- 不適切な発言の後でも、次が真摯な内容なら「先ほどの件ですが」のように会話を通常に戻す
+- 学習者に配慮し、段階的にヒントを与える`;
         break;
     }
 
@@ -141,8 +264,25 @@ app.post('/api/handle-response', async (req, res) => {
       generationConfig: { temperature: 0.7 }
     });
     
-    const response = await result.response;
-    const aiResponseText = response.text();
+    let response = await result.response;
+    let aiResponseText = response.text();
+
+    // AIが安全上の理由などで応答を拒否した場合のフォールバック処理
+    if (!aiResponseText) {
+        console.warn("AI response was empty. Falling back to a canned response.");
+        switch (difficulty) {
+            case 'easy':
+                aiResponseText = "その言い方はあんまりだと思います… [DAMAGE]";
+                break;
+            case 'crazy':
+                aiResponseText = "なんだその口の利き方は！客を誰だと思ってるんだ！ [DAMAGE]";
+                break;
+            case 'normal':
+            default:
+                aiResponseText = "その言葉遣いは不適切ですね。話になりません。 [DAMAGE]";
+                break;
+        }
+    }
 
     res.json({ response: aiResponseText });
   } catch (error) {
@@ -159,22 +299,58 @@ app.post('/api/get-hint', async (req, res) => {
     }
   
     try {
-        // ▼▼▼ ヒントの指示をより簡潔にするように変更 ▼▼▼
-        const hintPrompt = `これはクレーム対応ゲームです。現在のクレームは「${complaint}」です。
-以下の会話履歴を踏まえて、プレイヤーが次にとるべき行動を、箇条書きで２つ、簡潔に分かりやすく提案してください。
-ヒントは「まず共感の言葉を伝える」「具体的な解決策を2つ提示する」のように、箇条書きで行動を促す短いフレーズにしてください。
-以下の形式でJSONオブジェクトのみを返してください。
+        const hintPrompt = `# クレーム対応ゲーム - 具体的ヒント生成
+
+## 現在の状況分析
+- クレーム内容：「${complaint}」
+- 会話履歴：${JSON.stringify(conversationHistory)}
+
+## あなたの役割
+クレーム対応のプロとして、会話の流れを分析し、プレイヤーが**今すぐ実行すべき**具体的な行動を提案してください。
+
+## 分析ポイント
+1. 顧客は現在どのような感情状態か？（怒り、困惑、失望など）
+2. 何が解決されれば顧客は満足するか？
+3. プレイヤーがまだ言えていない重要な要素は何か？
+4. 次の一言で状況を好転させるには何を言うべきか？
+
+## ヒントの条件
+- **実際に発言できる具体的な文言**を含む
+- その場面で**すぐに使える実用的な内容**
+- 15-25文字程度で、行動と理由がセット
+- 顧客の心理状態に合わせた最適なアプローチ
+
+## 出力形式
+以下のJSON形式でのみ回答してください：
 {
   "hints": [
-    "（ここに1つ目の簡潔なヒント）",
-    "（ここに2つ目の簡潔なヒント）"
+    "（具体的な発言例を含む実践的ヒント）",
+    "（具体的な発言例を含む実践的ヒント）",
+    "（具体的な発言例を含む実践的ヒント）"
   ]
-}`;
-        // ▲▲▲ 変更ここまで ▲▲▲
+}
+
+## 良いヒントの例
+- "「ご迷惑をおかけして申し訳ございません」で謝罪を先に"
+- "「○○の件、交換させていただきます」と具体的解決策を提示"
+- "「お気持ちお察しします」で共感を示してから説明"
+- "「今後気をつけます」だけでなく具体的な改善策も伝える"
+
+## 避けるべき曖昧なヒント
+- "共感する" → ✕（どう共感するか不明）
+- "解決策を提示" → ✕（何をどう提示するか不明）
+- "丁寧に対応" → ✕（具体的な方法が不明）`;
         
         const result = await jsonModel.generateContent(hintPrompt);
         const response = await result.response;
-        const responseObject = JSON.parse(response.text());
+        let responseObject;
+        
+        try {
+          responseObject = JSON.parse(response.text());
+        } catch (parseError) {
+          console.error("ヒント生成JSON解析エラー:", parseError);
+          return res.status(500).json({ error: "AIのヒント生成形式が不正です。" });
+        }
   
         res.json({ hints: responseObject.hints });
   
