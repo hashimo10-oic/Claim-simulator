@@ -24,14 +24,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const hintTextDisplay = document.getElementById('hintText');
     const closeHintButton = document.getElementById('closeHintButton');
 
-    const settingsButton = document.getElementById('settingsButton');
-    const settingsModal = document.getElementById('settingsModal');
-    const closeSettingsButton = document.getElementById('closeSettings');
-    const bgmVolumeControl = document.getElementById('bgmVolume');
-    const seVolumeControl = document.getElementById('seVolume');
-    const giveUpButton = document.getElementById('giveUpButton');
-    const bgmVolumeDisplay = document.getElementById('bgmVolumeDisplay');
-    const seVolumeDisplay = document.getElementById('seVolumeDisplay');
+    // 削除された設定ボタンとモーダルに関連する要素の宣言を削除
+    // const settingsButton = document.getElementById('settingsButton');
+    // const settingsModal = document.getElementById('settingsModal');
+    // const closeSettingsButton = document.getElementById('closeSettings');
+    // const bgmVolumeControl = document.getElementById('bgmVolume');
+    // const seVolumeControl = document.getElementById('seVolume');
+    // const giveUpButton = document.getElementById('giveUpButton'); // このgiveUpButtonは設定モーダル内のものなので削除
+    // const bgmVolumeDisplay = document.getElementById('bgmVolumeDisplay');
+    // const seVolumeDisplay = document.getElementById('seVolumeDisplay');
+
+    // 新しく追加された「諦める」ボタンの参照
+    const giveUpGameButton = document.getElementById('giveUpGameButton');
 
     let timeLeft = 5 * 60;
     let currentHP = 3;
@@ -277,41 +281,52 @@ document.addEventListener('DOMContentLoaded', () => {
         hintContainer.classList.add('hidden');
     });
 
-    settingsButton.addEventListener('click', () => settingsModal.classList.remove('hidden'));
-    closeSettingsButton.addEventListener('click', () => settingsModal.classList.add('hidden'));
+    // 削除された設定ボタンとモーダルに関連するイベントリスナーを削除
+    // settingsButton.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    // closeSettingsButton.addEventListener('click', () => settingsModal.classList.add('hidden'));
     
-    const bgmAudio = new Audio();
-    bgmAudio.loop = true;
-    const seAudio = new Audio();
+    // BGMとSEの音量コントロールは設定モーダル内にあったため、関連する要素がHTMLから削除された場合、
+    // これらのロジックも機能しなくなります。必要であれば、HTMLの別の場所に音量コントロールを移動してください。
+    // const bgmAudio = new Audio();
+    // bgmAudio.loop = true;
+    // const seAudio = new Audio();
     
-    const updateVolumeDisplays = () => {
-        bgmAudio.volume = parseFloat(localStorage.getItem('bgmVolume') || 0.5);
-        seAudio.volume = parseFloat(localStorage.getItem('seVolume') || 0.5);
-        bgmVolumeControl.value = bgmAudio.volume;
-        seVolumeControl.value = seAudio.volume;
-        bgmVolumeDisplay.textContent = Math.round(bgmAudio.volume * 100);
-        seVolumeDisplay.textContent = Math.round(seAudio.volume * 100);
-    };
+    // const updateVolumeDisplays = () => {
+    //     bgmAudio.volume = parseFloat(localStorage.getItem('bgmVolume') || 0.5);
+    //     seAudio.volume = parseFloat(localStorage.getItem('seVolume') || 0.5);
+    //     bgmVolumeControl.value = bgmAudio.volume;
+    //     seVolumeControl.value = seAudio.volume;
+    //     bgmVolumeDisplay.textContent = Math.round(bgmAudio.volume * 100);
+    //     seVolumeDisplay.textContent = Math.round(seAudio.volume * 100);
+    // };
 
-    bgmVolumeControl.addEventListener('input', (event) => {
-        const volume = parseFloat(event.target.value);
-        bgmAudio.volume = volume;
-        localStorage.setItem('bgmVolume', volume);
-        bgmVolumeDisplay.textContent = Math.round(volume * 100);
-    });
+    // bgmVolumeControl.addEventListener('input', (event) => {
+    //     const volume = parseFloat(event.target.value);
+    //     bgmAudio.volume = volume;
+    //     localStorage.setItem('bgmVolume', volume);
+    //     bgmVolumeDisplay.textContent = Math.round(volume * 100);
+    // });
 
-    seVolumeControl.addEventListener('input', (event) => {
-        const volume = parseFloat(event.target.value);
-        seAudio.volume = volume;
-        localStorage.setItem('seVolume', volume);
-        seVolumeDisplay.textContent = Math.round(volume * 100);
-    });
+    // seVolumeControl.addEventListener('input', (event) => {
+    //     const volume = parseFloat(event.target.value);
+    //     seAudio.volume = volume;
+    //     localStorage.setItem('seVolume', volume);
+    //     seVolumeDisplay.textContent = Math.round(volume * 100);
+    // });
 
-    giveUpButton.addEventListener('click', () => {
-        showAlert('ゲームをあきらめます...', 'error');
-        clearInterval(gameInterval);
-        setTimeout(() => window.location.href = getRelativePath('game_over.html'), 1500);
-    });
+    // 新しい「諦める」ボタンのイベントリスナー
+    if (giveUpGameButton) {
+        giveUpGameButton.addEventListener('click', () => {
+            // ここではshowAlertを使用していますが、よりリッチなカスタムモーダルUIを推奨します。
+            const confirmGiveUp = window.confirm('対応をあきらめますか？');
+            if (confirmGiveUp) {
+                clearInterval(gameInterval); // ゲームタイマーを停止
+                window.location.href = getRelativePath('game_over.html'); // game_over.htmlに遷移
+            }
+        });
+    } else {
+        console.error("Element with ID 'giveUpGameButton' not found.");
+    }
 
     myMessageInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
@@ -321,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateLifeIcons();
-    updateVolumeDisplays();
+    // updateVolumeDisplays(); // 音量コントロールがHTMLから削除されたため、コメントアウト
     gameInterval = setInterval(updateTimer, 1000);
     initializeGameConversation();
 });
