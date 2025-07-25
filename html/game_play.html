@@ -6,23 +6,30 @@
     <title>カスマス</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 既存のスタイルシート -->
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <div class="game-container">
         <div class="status-bar">
             <div class="flex items-center gap-2">
-                <button id="settingsButton" class="text-gray-500 hover:text-gray-700 text-2xl font-bold p-1 rounded-full hover:bg-gray-200 transition duration-200">
-                    <i class="fas fa-ellipsis-h"></i>
-                </button>
+                <!-- 左上の設定ボタンを削除しました -->
                 <div class="timer">
                     <i class="far fa-clock"></i> <span id="gameTimer">5:00</span>
                 </div>
             </div>
             <div class="complaint-text">
-                <span id="complaintText"></span> </div>
-            <div class="life-icons" id="lifeIcons">
+                <span id="complaintText"></span>
+            </div>
+            <div class="life-icons-and-giveup flex items-center gap-2">
+                <div class="life-icons" id="lifeIcons">
+                    <!-- ライフアイコンはgamescript.jsによって動的に追加されます -->
                 </div>
+                <!-- 「諦める」ボタンをハートの横に追加しました -->
+                <button id="giveUpGameButton" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-200 shadow-md text-sm">
+                    諦める
+                </button>
+            </div>
         </div>
 
         <div class="main-content-area">
@@ -32,7 +39,8 @@
             </div>
 
             <div class="message-history" id="messageHistory">
-                </div>
+                <!-- メッセージ履歴はここに動的に追加されます -->
+            </div>
         </div>
         <div class="loading-indicator hidden" id="loadingIndicator">
             <div class="loading-spinner"></div>
@@ -49,32 +57,7 @@
         </div>
     </div>
 
-    <div id="settingsModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="settings-modal">
-            <button id="closeSettings" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold">&times;</button>
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">設定</h2>
-
-            <div class="space-y-6">
-                <div>
-                    <label for="bgmVolume" class="block text-gray-700 text-lg font-semibold mb-2">BGM 音量</label>
-                    <div class="volume-control-group">
-                        <input type="range" id="bgmVolume" min="0" max="1" step="0.01" value="0.5" class="w-full h-3 bg-blue-100 rounded-lg appearance-none cursor-pointer range-lg accent-blue-500">
-                        <span id="bgmVolumeDisplay" class="volume-value">50</span>
-                    </div>
-                </div>
-                <div>
-                    <label for="seVolume" class="block text-gray-700 text-lg font-semibold mb-2">SE 音量</label>
-                    <div class="volume-control-group">
-                        <input type="range" id="seVolume" min="0" max="1" step="0.01" value="0.5" class="w-full h-3 bg-blue-100 rounded-lg appearance-none cursor-pointer range-lg accent-blue-500">
-                        <span id="seVolumeDisplay" class="volume-value">50</span>
-                    </div>
-                </div>
-                <button id="giveUpButton" class="w-full py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition duration-200 shadow-md">
-                    あきらめる
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- 設定モーダル全体を削除しました -->
 
     <div id="hintContainer" class="hidden fixed bottom-4 right-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-lg shadow-lg z-40 max-w-sm w-11/12">
         <div class="relative">
@@ -88,6 +71,7 @@
             <button id="closeHintButton" class="absolute -top-2 -right-2 text-xl font-bold text-yellow-800 hover:text-yellow-900">&times;</button>
         </div>
     </div>
+    <!-- gamescript.js を読み込みます。このファイルに新しいロジックを追加します。 -->
     <script src="../js/gamescript.js"></script>
 </body>
 </html>
